@@ -1,4 +1,4 @@
-package main
+package monitoring
 
 import (
 	"database/sql"
@@ -7,9 +7,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var garbage string
+
+var db *sqlx.DB
+var Services = make(map[int]Service)
 
 type Service struct {
 	Id               int    `db:"serviceID"`
@@ -17,13 +21,30 @@ type Service struct {
 	Host             string `db:"host"`
 	Label            string `db:"label"`
 	Executable       string `db:"executable"`
+	Arguments        string `db:"arguments"`
 	Timeout          int    `db:"timeout"`
 	Interval         int    `db:"intervaltime"`
-	Threshold        int    `db:"warning_threshold"`
-	ThresholdCounter int    `db:"warning_threshold_counter"`
-	LastCheck        string `db:"lastcheck"`
+	Threshold        int    `db:"warningthreshold"`
+	ThresholdCounter int
+	LastCheck        time.Time
+	Lock             bool
+	Comment          string
 	Test             sql.NullBool
-	StatusIcon       string
+}
+
+func (service Service) print() {
+	fmt.Println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
+	fmt.Print("┃ ID:     \t")
+	fmt.Println(service.Id)
+	fmt.Print("┃ OK:     \t")
+	fmt.Println(StatusColor("●", service.Ok))
+	fmt.Println("┃ Host:   \t" + service.Host)
+	fmt.Println("┃ Label:  \t" + service.Label)
+	fmt.Println("┃ Command: \t" + service.Executable)
+	fmt.Println("┃ Last check: \t" + strconv.Itoa(int(service.LastCheck.Unix())))
+	fmt.Printf("┃ Timeout: \t%v\n┃ Interval:\t%v\n┃ Threshold:\t%v/%v", service.Timeout, service.Interval, service.ThresholdCounter, service.Threshold)
+	fmt.Println("")
+	fmt.Println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
 }
 
 func StatusColor(text string, positive bool) string {
@@ -34,34 +55,15 @@ func StatusColor(text string, positive bool) string {
 	}
 }
 
-func f(from string) {
-	for i := 0; i < 5; i++ {
-		fmt.Println(from, ":", i)
-	}
-}
+func childSpawn(service Service) {
 
-func childSpawn(executable string, arguments string) {
-	args := strings.Split(arguments, ",")
-
+	executable := "checks/" + service.Executable
+	args := strings.Split(service.Arguments, ",")
 	DebugExec(executable, args)
-}
-
-func (service Service) print() {
-	fmt.Print("ID:     \t")
-	fmt.Println(service.Id)
-
-	fmt.Print("OK:     \t")
-	fmt.Println(StatusColor("●", service.Ok))
-	fmt.Println("Host:   \t" + service.Host)
-	fmt.Println("Label:  \t" + service.Label)
-	fmt.Println("Command: \t" + service.Executable)
-	fmt.Println("Last check: \t" + service.LastCheck)
-	fmt.Printf("Timeout: \t%v\nInterval:\t%v\nThreshold:\t%v/%v", service.Timeout, service.Interval, service.ThresholdCounter, service.Threshold)
-	fmt.Println("********")
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("********")
-	fmt.Println("")
+	if int(service.LastCheck.Unix())+service.Interval >= int(time.Now().Unix()) {
+		fmt.Println("Tijd om te checken!")
+	}
+	service.LastCheck = time.Now()
 }
 
 func checkError(e error) {
@@ -70,40 +72,86 @@ func checkError(e error) {
 	}
 }
 
-func main() {
+func slicePoll() {
+	for {
+
+		for key, service := range Services {
+			diff := int(time.Now().Unix()) - int(service.LastCheck.Unix())
+			//editableService := service
+			fmt.Print("\nID:", key, "  ")
+			//	fmt.Println(diff)
+
+			if diff > service.Interval {
+				fmt.Println("---Tijd om te checken!")
+				service.Comment = "YES HET WERKT!!111"
+				service.LastCheck = time.Now()
+			}
+
+			Services[key] = service //update the struct in map m with new data
+		}
+		for i := 0; i < 5; i++ {
+			fmt.Print("● ")
+			time.Sleep(1 * time.Second)
+			//fmt.Println("Next run in " + strconv.Itoa(3-i) + "..")
+		}
+		fmt.Println("")
+
+		Services[278].print()
+
+	}
+}
+
+func Init() {
 	fmt.Println("Started.")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nrc.nl,-c 1,-i 0.2")
-	go childSpawn("timeout", "5,ping,nu.nl -c 1")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("curl", "undone.nl,-I")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("ping", "nu.nl,-c 1,-i 0.2")
-	go childSpawn("cat", "/etc/hosts")
+	reloadServices()
+
+	//Services[278].print()
+
+	go slicePoll()
+
+}
+
+func reloadServices() {
+	fmt.Println("Connecting db.")
+	db = sqlx.MustConnect("mysql", "serverstat@tcp(localhost:3306)/serverstat")
+
+	rows, err := db.Queryx("SELECT serviceID, ok, host, label, timeout, executable, arguments, intervaltime, warningthreshold FROM service WHERE enabled = true LIMIT 3")
+	checkError(err)
+	enabledServicesCounter := 0
+
+	for rows.Next() {
+		var service Service
+		err = rows.StructScan(&service)
+		checkError(err)
+
+		Services[service.Id] = service
+		enabledServicesCounter++
+	}
+	fmt.Print(enabledServicesCounter)
+	fmt.Println(" services loaded.")
+}
+
+func nutteloos() {
+	garbage = strconv.Itoa(6)
 
 	var input string
 	fmt.Scanln(&input)
 	fmt.Println("done")
 	/*	go f("goroutine")
 		f("direct")*/
+
+	/*	for rows.Next() {
+		var service Service
+		err = rows.StructScan(&service)
+		checkError(err)
+		go childSpawn(service)
+	}*/
 }
 
-func geenmain() {
+/*func geenmain() {
 	garbage = strconv.Itoa(6)
 	// Must.... functions will panic on fail
-	db := sqlx.MustConnect("mysql", "serverstat@tcp(localhost:3306)/serverstat")
-	//var service Service
-	// We'll get most recent item and map it into our struct
-	//err := db.Get(&service, "SELECT host, label FROM service ORDER BY serviceID DESC LIMIT 1")
+	db = sqlx.MustConnect("mysql", "serverstat@tcp(localhost:3306)/serverstat")
 
 	rows, err := db.Queryx("SELECT serviceID, ok, host, label, timeout, executable, arguments, lastcheck, intervaltime, warning_threshold, warning_threshold_counter FROM service ")
 
@@ -115,15 +163,12 @@ func geenmain() {
 
 	for rows.Next() {
 		var service Service
-
 		err = rows.StructScan(&service)
 		checkError(err)
-
 		service.print()
-
 	}
 
-}
+}*/
 
 /*func main()
 	db, err := sqlx.Connect("mysql", "user=serverstat dbname=serverstat sslmode=disable")
@@ -157,5 +202,27 @@ func geenmain() {
 	rtime                     float64 `db:"rtime"`
 	lastcheck                 string  `db:"lastcheck"`
 	action                    int     `db:"action"`
+}
+
+func livePoll() {
+	for {
+
+		rows, err := db.Queryx("SELECT serviceID, ok, host, label, timeout, executable, arguments, lastcheck, intervaltime, warning_threshold, warning_threshold_counter FROM service WHERE enabled = true AND serviceID  = 278 ")
+		checkError(err)
+
+		for rows.Next() {
+			var service Service
+			err = rows.StructScan(&service)
+			checkError(err)
+			go childSpawn(service)
+		}
+
+		for i := 0; i < 4; i++ {
+			time.Sleep(1 * time.Second)
+			//fmt.Println("Next run in " + strconv.Itoa(3-i) + "..")
+		}
+		fmt.Println("")
+
+	}
 }
 */

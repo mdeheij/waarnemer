@@ -1,0 +1,4 @@
+PING 8.8.8.3 (8.8.8.3) 56(84) bytes of data.
+
+--- 8.8.8.3 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1007ms

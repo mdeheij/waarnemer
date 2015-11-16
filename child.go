@@ -1,4 +1,4 @@
-package main
+package monitoring
 
 import "os"
 import "os/exec"
@@ -23,8 +23,8 @@ func main2() {
 
 func DebugExec(executable string, args []string) (status int) {
 	now := time.Now()
-	time := strconv.Itoa(now.Hour()) + ":" + strconv.Itoa(now.Minute())
-
+	//time := strconv.Itoa(now.Hour()) + ":" + strconv.Itoa(now.Minute()) + ":" + strconv.Itoa(now.Nanosecond())
+	time := now.String()
 	status, output := execute(executable, args)
 
 	var tekentje string
@@ -49,7 +49,7 @@ func execute(cmdName string, cmdArgs []string) (status int, output string) {
 	var waitStatus syscall.WaitStatus
 	if err := cmd.Run(); err != nil {
 		if err != nil {
-			os.Stderr.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
+			//os.Stderr.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
 		}
 		if exitError, ok := err.(*exec.ExitError); ok {
 			waitStatus = exitError.Sys().(syscall.WaitStatus)
