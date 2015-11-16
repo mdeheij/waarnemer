@@ -34,11 +34,12 @@ func DebugExec(executable string, args []string) (status int) {
 		tekentje = StatusColor("●", true)
 	}
 
-	fmt.Println(tekentje + " [" + time + "] (" + strconv.Itoa(status) + ") - " + output)
+	fmt.Println(tekentje + " [" + time + "] (" + strconv.Itoa(status) + ") - [" + executable + "] [" + args[0] + "] " + output)
 	return status
 }
 
 func execute(cmdName string, cmdArgs []string) (status int, output string) {
+	// TODO: Check if cmdName file exists, returning some high error if not.
 	cmd := exec.Command(cmdName, cmdArgs...)
 	//	cmd := exec.Command("cat", "8.8.1.6", "-c 1") //complete bullshit for exit code simulation
 	cmdOutput := &bytes.Buffer{}
