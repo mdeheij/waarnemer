@@ -1,5 +1,5 @@
 #!/bin/bash
-timeout=2
+timeout=5
 
 while getopts ":H:t:" opt; do
   case $opt in
@@ -8,18 +8,18 @@ while getopts ":H:t:" opt; do
   esac
 done
 
-exit 4
 
-rawping=$(ping $host -c 1 -w $timeout -i 1)
-#echo "ping $host -c 1 -w $timeout -i 1"
+raw=$(timeout $timeout curl --write-out "%{http_code}\n" -m $timeout -L $host -s -I --output /dev/null)
+output=$(echo "$raw")
 
-if [[ $rawping == *"1 received"* ]]
+
+
+if [[ $output == *"200"* ]]
 then
-  	echo "OK - ping received"
+  	echo "200 OK"
   	exit 0
 else 
-	echo "PING CRITICAL"
-	echo "$rawping" > rawping.log
+	echo "ERROR - $raw - $host"
 	exit 2
 fi
 

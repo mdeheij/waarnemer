@@ -1,7 +1,7 @@
 package monitoring
 
 import (
-	"database/sql"
+	_ "database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -15,6 +15,8 @@ var garbage string
 var db *sqlx.DB
 var Services = make(map[int]Service)
 
+var ChecksFolder string = "/home/mdeheij/projects/src/github.com/mdeheij/monitoring/checks/"
+
 type Service struct {
 	Id               int    `db:"serviceID"`
 	Ok               bool   `db:"ok"`
@@ -23,6 +25,7 @@ type Service struct {
 	Label            string `db:"label"`
 	Executable       string `db:"executable"`
 	Arguments        string `db:"arguments"`
+	Acknowledged     string `db:"ack"`
 	Timeout          int    `db:"timeout"`
 	Interval         int    `db:"intervaltime"`
 	Threshold        int    `db:"warningthreshold"`
@@ -33,7 +36,6 @@ type Service struct {
 	DisplayHealth    string
 	DisplayTools     string
 	DisplayTimeDiff  int
-	_                sql.NullBool
 }
 
 func (service Service) enable() {
@@ -75,15 +77,25 @@ func StatusColor(text string, positive bool) string {
 
 func (service Service) spawnChild() {
 
-	executable := "/home/mdeheij/projects/src/github.com/mdeheij/monitoring/checks/" + service.Executable
+	executable := ChecksFolder + service.Executable
 	args := strings.Split(service.Arguments, ",")
-	DebugExec(executable, args)
-	timeNextCheck := int(service.LastCheck.Unix()) + service.Interval
-	if timeNextCheck >= int(time.Now().Unix()) {
-		fmt.Println("Checking")
+	status := DebugExec(executable, args)
+	if status > 0 {
+		service.Ok = false
+		//go service.handleDown --> func (service Service) handleDown
 	} else {
-		//fmt.Println(timeNextCheck - int(time.Now().Unix()))
+		service.Ok = true
+		//dit moet wel ff in SQL komen wellicht? maar niet fatal.
+		// hmm misschien ook niet.
+		// even over slapen.
 	}
+	/*
+		timeNextCheck := int(service.LastCheck.Unix()) + service.Interval
+		if timeNextCheck >= int(time.Now().Unix()) {
+			fmt.Println("Checking")
+		} else {
+			//fmt.Println(timeNextCheck - int(time.Now().Unix()))
+		}*/
 	service.LastCheck = time.Now()
 	Services[service.Id] = service
 }
@@ -104,8 +116,9 @@ func slicePoll() {
 			//	fmt.Println(diff)
 			if service.Enabled {
 				if diff > service.Interval {
+					service.print()
 					fmt.Println("--- Checking")
-					//lock current chat
+					//lock current check
 					service.Lock = true
 					service.Comment = "Locked!"
 					Services[key] = service
@@ -114,9 +127,9 @@ func slicePoll() {
 					//commit to map
 
 				} else {
-					nextCheck := service.Interval - diff
-					fmt.Print(service.Label + " will check in: ")
-					fmt.Println(nextCheck)
+					//nextCheck := service.Interval - diff
+					//	fmt.Print(service.Label + " will check in: ")
+					//	fmt.Println(nextCheck)
 				}
 			}
 			//update the struct in map m with new data

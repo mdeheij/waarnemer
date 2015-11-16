@@ -44,6 +44,7 @@ func execute(cmdName string, cmdArgs []string) (status int, output string) {
 	//	cmd := exec.Command("cat", "8.8.1.6", "-c 1") //complete bullshit for exit code simulation
 	cmdOutput := &bytes.Buffer{}
 	errOutput := &bytes.Buffer{}
+	fail := false
 	cmd.Stdout = cmdOutput
 	cmd.Stderr = errOutput
 
@@ -51,6 +52,7 @@ func execute(cmdName string, cmdArgs []string) (status int, output string) {
 	if err := cmd.Run(); err != nil {
 		if err != nil {
 			//os.Stderr.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
+			fail = true
 		}
 		if exitError, ok := err.(*exec.ExitError); ok {
 			waitStatus = exitError.Sys().(syscall.WaitStatus)
@@ -69,6 +71,10 @@ func execute(cmdName string, cmdArgs []string) (status int, output string) {
 
 	outputString := string(cmdOutput.Bytes())
 	shortOutputStrings := strings.Split(outputString, "\n")
+	statusCode := waitStatus.ExitStatus()
+	if waitStatus.ExitStatus() == 0 && fail {
+		statusCode = 420
+	}
 
-	return waitStatus.ExitStatus(), shortOutputStrings[0]
+	return statusCode, shortOutputStrings[0]
 }
