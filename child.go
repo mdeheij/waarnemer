@@ -21,21 +21,21 @@ func main2() {
 
 }
 
-func DebugExec(executable string, args []string) (status int) {
+func CheckService(executable string, args []string) (status int, output string) {
 	now := time.Now()
 	//time := strconv.Itoa(now.Hour()) + ":" + strconv.Itoa(now.Minute()) + ":" + strconv.Itoa(now.Nanosecond())
 	time := now.String()
-	status, output := execute(executable, args)
+	status, outputMsg := execute(executable, args)
 
 	var tekentje string
 	if status > 0 {
-		tekentje = StatusColor("●", false)
+		tekentje = StatusColor("●", 2)
 	} else {
-		tekentje = StatusColor("●", true)
+		tekentje = StatusColor("●", 0)
 	}
 
-	fmt.Println(tekentje + " [" + time + "] (" + strconv.Itoa(status) + ") - [" + executable + "] [" + args[0] + "] " + output)
-	return status
+	fmt.Println(tekentje + " [" + time + "] (" + strconv.Itoa(status) + ") - [" + executable + "] [" + args[0] + "] " + outputMsg)
+	return status, outputMsg
 }
 
 func execute(cmdName string, cmdArgs []string) (status int, output string) {

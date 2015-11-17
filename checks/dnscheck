@@ -1,0 +1,25 @@
+#!/bin/bash
+nameserver="8.8.8.8"
+timeout="2"
+while getopts ":H:t:r:n:" opt; do
+  case $opt in
+    H)     host=$OPTARG             ;;
+    t)     timeout=$OPTARG          ;;
+    r)     result=$OPTARG          ;;
+    n)     nameserver=$OPTARG          ;;
+  esac
+done
+
+
+
+digAnswer=$(timeout $timeout dig $host @$nameserver +short)
+  
+
+if [[ $digAnswer == *"$result"* ]]
+then
+  	echo "OK - $digAnswer"
+  	exit 0
+else 
+  	echo "DNS ERROR! $digAnswer"
+  	exit 2
+fi

@@ -16,10 +16,11 @@ var db *sqlx.DB
 var Services = make(map[int]Service)
 
 var ChecksFolder string = "/home/mdeheij/projects/src/github.com/mdeheij/monitoring/checks/"
+var daemonActive = false
 
 type Service struct {
 	Id               int    `db:"serviceID"`
-	Ok               bool   `db:"ok"`
+	Health           int    `db:"health"`
 	Enabled          bool   `db:"enabled"`
 	Host             string `db:"host"`
 	Label            string `db:"label"`
@@ -57,7 +58,7 @@ func (service Service) print() {
 	fmt.Print("┃ ID:     \t")
 	fmt.Println(service.Id)
 	fmt.Print("┃ OK:     \t")
-	fmt.Println(StatusColor("●", service.Ok))
+	fmt.Println(StatusColor("●", service.Health))
 	fmt.Println("┃ Host:   \t" + service.Host)
 	fmt.Println("┃ Label:  \t" + service.Label)
 	fmt.Println("┃ Command: \t" + service.Executable)
@@ -67,11 +68,17 @@ func (service Service) print() {
 	fmt.Println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
 }
 
-func StatusColor(text string, positive bool) string {
-	if positive {
+func StatusColor(text string, health int) string {
+
+	switch health {
+	case 0:
 		return "\x1b[32;1m" + text + "\x1b[0m"
-	} else {
+	case 1:
+		return "\x1b[33;1m" + text + "\x1b[0m"
+	case 2:
 		return "\x1b[31;1m" + text + "\x1b[0m"
+	default:
+		return "\x1b[33;1m NEEDEFAULT" + text + "\x1b[0m"
 	}
 }
 
@@ -79,24 +86,44 @@ func (service Service) spawnChild() {
 
 	executable := ChecksFolder + service.Executable
 	args := strings.Split(service.Arguments, ",")
-	status := DebugExec(executable, args)
-	if status > 0 {
-		service.Ok = false
+	status, output := CheckService(executable, args)
+	if status > 0 { //It's going down
+
+		oldHealth := service.Health
+		service.Health = 2
+		service.Comment = "Output: " + output
+		service.ThresholdCounter++
+
+		if oldHealth == 0 {
+			service.Health = 1 //(re)set warning state
+		}
+
+		if oldHealth == 1 && service.ThresholdCounter >= service.Threshold {
+			service.Health = 2      //It's officially down!
+			a := NewAction(service) //Ready for action
+			a.errorMsg = output
+			a.Run()
+		}
+
 		//go service.handleDown --> func (service Service) handleDown
 	} else {
-		service.Ok = true
-		//dit moet wel ff in SQL komen wellicht? maar niet fatal.
+		oldHealth := service.Health
+		service.Health = 0
+		service.ThresholdCounter = 0
+		if oldHealth == 2 {
+			a := NewAction(service) //Ready for recovery notify
+			a.errorMsg = output
+			a.Run()
+		}
+		// dit moet wel ff in SQL komen wellicht?
 		// hmm misschien ook niet.
 		// even over slapen.
+		// 1 vote voor nee
 	}
-	/*
-		timeNextCheck := int(service.LastCheck.Unix()) + service.Interval
-		if timeNextCheck >= int(time.Now().Unix()) {
-			fmt.Println("Checking")
-		} else {
-			//fmt.Println(timeNextCheck - int(time.Now().Unix()))
-		}*/
+
+	service.Lock = false
 	service.LastCheck = time.Now()
+	service.print()
 	Services[service.Id] = service
 }
 
@@ -107,40 +134,39 @@ func checkError(e error) {
 }
 
 func slicePoll() {
+
 	for {
+		if daemonActive == true {
+			for key, service := range Services {
+				diff := int(time.Now().Unix()) - int(service.LastCheck.Unix())
+				//editableService := service
+				//fmt.Print("ID:", key, "  ")
+				//	fmt.Println(diff)
+				if service.Enabled {
+					if diff > service.Interval {
+						//service.print()
+						//lock current check
+						service.Lock = true
+						service.Comment = "Locked!"
+						Services[key] = service
+						go service.spawnChild()
 
-		for key, service := range Services {
-			diff := int(time.Now().Unix()) - int(service.LastCheck.Unix())
-			//editableService := service
-			//fmt.Print("ID:", key, "  ")
-			//	fmt.Println(diff)
-			if service.Enabled {
-				if diff > service.Interval {
-					service.print()
-					fmt.Println("--- Checking")
-					//lock current check
-					service.Lock = true
-					service.Comment = "Locked!"
-					Services[key] = service
-					go service.spawnChild()
+						//commit to map
 
-					//commit to map
-
-				} else {
-					//nextCheck := service.Interval - diff
-					//	fmt.Print(service.Label + " will check in: ")
-					//	fmt.Println(nextCheck)
+					} else {
+						/*	nextCheck := service.Interval - diff
+							fmt.Print(service.Label + " will check in: ")
+							fmt.Println(nextCheck)*/
+					}
 				}
+				//update the struct in map m with new data
 			}
-			//update the struct in map m with new data
+			for i := 0; i < 1; i++ {
+				//	fmt.Println("● ")
+				time.Sleep(1 * time.Second)
+				//fmt.Println("Next run in " + strconv.Itoa(3-i) + "..")
+			}
 		}
-		for i := 0; i < 1; i++ {
-			//fmt.Println("● ")
-			time.Sleep(1 * time.Second)
-			//fmt.Println("Next run in " + strconv.Itoa(3-i) + "..")
-		}
-		fmt.Println("")
-
 	}
 }
 
@@ -149,12 +175,20 @@ func Init() {
 	reloadServices()
 	go slicePoll()
 }
+func Start() {
+	fmt.Println("Starting..")
+	daemonActive = true
+}
+func Stop() {
+	fmt.Println("Stopping..")
+	daemonActive = false
+}
 
 func reloadServices() {
 	fmt.Println("Connecting db.")
-	db = sqlx.MustConnect("mysql", "serverstat:fawkejrutwt573458239gWRRFHWG@tcp(shared.mike.solutions:3306)/serverstat")
+	db = sqlx.MustConnect("mysql", "serverstat@tcp(localhost:3306)/serverstat")
 
-	rows, err := db.Queryx("SELECT serviceID, ok, enabled, host, label, timeout, executable, arguments, intervaltime, warningthreshold FROM service")
+	rows, err := db.Queryx("SELECT serviceID, enabled, host, label, timeout, executable, arguments, intervaltime, warningthreshold FROM service")
 	checkError(err)
 	enabledServicesCounter := 0
 
@@ -162,7 +196,7 @@ func reloadServices() {
 		var service Service
 		err = rows.StructScan(&service)
 		checkError(err)
-
+		service.Health = -1 //you know nothing, monitoring
 		Services[service.Id] = service
 		enabledServicesCounter++
 	}
@@ -176,15 +210,6 @@ func nutteloos() {
 	var input string
 	fmt.Scanln(&input)
 	fmt.Println("done")
-	/*	go f("goroutine")
-		f("direct")*/
-
-	/*	for rows.Next() {
-		var service Service
-		err = rows.StructScan(&service)
-		checkError(err)
-		go childSpawn(service)
-	}*/
 }
 
 /*func geenmain() {

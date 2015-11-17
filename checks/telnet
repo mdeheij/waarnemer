@@ -1,0 +1,23 @@
+#!/bin/bash
+timeout=5
+
+while getopts ":H:t:p:" opt; do
+  case $opt in
+    H)     host=$OPTARG          ;;
+    t) 		timeout=$OPTARG		 ;;
+    p)     port=$OPTARG          ;;
+  esac
+done
+
+raw=$(timeout $timeout echo exit | telnet $host $port)
+output=$(echo "$raw")
+
+
+if [[ $output == *Connected* ]]
+then
+  echo "OK - CONNECTED WITH TIMEOUT $timeout"
+  exit 0
+else 
+  echo "CRITICAL - Not Connected: $output"
+  exit 2
+fi

@@ -1,5 +1,4 @@
 #!/bin/bash
-timeout=5
 
 while getopts ":H:t:" opt; do
   case $opt in
@@ -13,16 +12,17 @@ raw=$(timeout $timeout curl --write-out "%{http_code}\n" -m $timeout -L $host -s
 output=$(echo "$raw")
 
 
+
 if [[ $output == *"200"* ]]
 then
-  	echo "200 OK"
-  	exit 0
+  	echo "CRITICAL - 200 NOT OK"
+  	exit 2
 else 
-	echo "ERROR - $raw - $host"
-	exit 2
+	echo "OK - SERVICE UNAVAILABLE"
+	exit 0
 fi
 
-
+c
 # time=$(echo "$rawping" | tail -1| awk '{print $4}' | cut -d '/' -f 2)
 # echo "time=$time;"
 # #echo "error=PING FAILED;"
