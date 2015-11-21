@@ -1,16 +1,20 @@
 #!/bin/bash
-start=`date +%s.%N`
-rawcheck=$(scripts/ssh mdeheij@42k.nl df -h | awk '{print $5}' | grep -v "Use%" | sed 's/%//' | head -n 1)
-end=`date +%s.%N`
-runtimems=$(echo "$end $start" | awk '{printf "%f", $1 - $2}')
-mscontant=1000
-runtime=$(echo "$runtimems * $mscontant" | bc)
-echo "time=$runtime;"
-
-
-
-if [[ ! ($rawcheck > 90)]]
-then
-  echo "status=ok;";
-fi
-echo "output=$rawcheck;"
+used_space=`df -h / | grep -v Filesystem | awk '{print $5}' | sed 's/%//g'`
+case $used_space in
+[1-84]*)
+echo "OK - $used_space% of disk space used."
+exit 0
+;;
+[85]*)
+echo "WARNING - $used_space% of disk space used."
+exit 1
+;;
+[86-100]*)
+echo "CRITICAL - $used_space% of disk space used."
+exit 2
+;;
+*)
+echo "UNKNOWN - $used_space% of disk space used."
+exit 3
+;;
+esac

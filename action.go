@@ -2,7 +2,7 @@ package monitoring
 
 import (
 	//"fmt"
-	"github.com/bartholdbos/Golegram"
+	"github.com/bartholdbos/golegram"
 	"strconv"
 	"time"
 )
@@ -41,7 +41,7 @@ func (a Action) messageBuilder() (msg string) {
 }
 
 func (a Action) SendTelegram() {
-
+	//shit, need to generate a new one because i just pushed my token to a public repo
 	bot, _ := Golegram.NewBot("94110015:AAE8TIIoQxyu4KdWRnGZ2_yvI9C6-1w1eF0")
 	_, _ = bot.SendMessage(4009810, a.messageBuilder())
 
