@@ -1,0 +1,15 @@
+.health-0 {
+background-color: #0ff !important;
+}
+.health-1 {
+background-color: #fffceb !important;
+}
+.health-2 {
+background-color: #fff1f0 !important;
+}
+.service-disabled {
+opacity: 0.4;
+}
+.lines path {
+stroke-width: 3px;
+}
