@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html class="uk-height-1-1">
+    {{ template "head.html" }}
+    <style>
+    html {
+    background: #cfe7fa;
+background: -moz-radial-gradient(center, ellipse cover, #cfe7fa 0%, #6393c1 100%);
+background: -webkit-radial-gradient(center, ellipse cover, #cfe7fa 0%,#6393c1 100%);
+background: radial-gradient(ellipse at center, #cfe7fa 0%,#6393c1 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfe7fa', endColorstr='#6393c1',GradientType=1 );
+    }
+    .deathly-shadow{
+         box-shadow: 0px 0px 16px 4px rgba(0,0,0,0.25);
+    }
+    </style>
+    <script type="text/javascript">
+    $(function() {
+        if ($(location).attr('href').indexOf('invalidpassword') >= 0) {
+            console.log("InvalidPass!");
+            $("#errorPlaceholder").replaceWith('<div class="deathly-shadow uk-alert uk-alert-danger" data-uk-alert=""><p>Invalid credentials or insufficient rights!</p></div>');
+        }
+    });
+    </script>
+    <body ng-controller="MainCtrl" class="uk-height-1-1">
+        
+        {{ template "menu-open.html" }}
+        {{ template "menu-close.html" }}
+         
+        <div class="uk-vertical-align uk-text-center uk-height-1-1">
+            <div class="uk-vertical-align-middle" style="width: 80%; max-width: 470px;" onload="document.loginForm.username.focus()">
+                
+                  <div id="errorPlaceholder"></div>
+                <div class="deathly-shadow uk-panel uk-panel-box" style="padding: 50px;">
+                    
+                 
+                    <form class="uk-form" name="loginForm" action="/login" method="POST">
+                        <div class="uk-form-row">
+                            <input class="uk-width-1-1 uk-form-large" name="username" value="{{.user}}" type="text" placeholder="Username">
+                        </div>
+                        <div class="uk-form-row">
+                            <input class="uk-width-1-1 uk-form-large" type="password" name="password" placeholder="Password">
+                        </div>
+                        <div class="uk-form-row">
+                            <div class="uk-text-center">
+                                <button type="submit" class="uk-button uk-button-primary uk-button-large uk-width-1-1">
+                                Login
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="" value="">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,20 @@
+      <li class="uk-parent" data-uk-dropdown="" aria-haspopup="true" aria-expanded="false">
+                <a href=""><i class="fa fa-refresh" id="refreshToolbarIcon"></i></a>
+                <div class="uk-dropdown uk-dropdown-navbar">
+                    <ul class="uk-nav uk-nav-navbar">
+                        <li>
+                            <a href="#">
+                                <input type="number" ng-model="pollingInterval" /> 
+                            </a>
+                            <a href="#">
+                                Current status: 
+                                <div class="uk-badge" ng-show="timerActive">On</div>
+                                <div class="uk-badge uk-badge-danger" ng-hide="timerActive">Off</div>
+                            </a>
+                            <a href="#" ng-click="resetPolling()">Start</a>
+                            <a href="#" ng-click="timerActive = false">Stop</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </li>

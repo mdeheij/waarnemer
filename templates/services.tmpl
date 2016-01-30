@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+    {{ template "head.html" }}
+    <body ng-controller="customersCtrl" >
+        <style>
+          
+        </style>
+    <body>
+
+
+
+        <div>
+
+          {{ template "menu-open.html" }}
+          {{ template "auto-refresh.html" }}
+          {{ template "menu-close.html" }}
+
+            
+            <div style="padding-top: 50px">
+
+    
+                <div class="uk-container uk-container-center">
+                    <h1>Services</h1>
+                    <!--  <h2>{{ .angular }} statusMsg }}</h2> -->
+                    <button ng-click="start()" class="uk-button uk-button-large uk-button-success" type="submit"><i class="fa fa-play"></i></button>
+                    <button ng-click="stop()" class="uk-button uk-button-large uk-button-danger" type="submit"><i class="fa fa-pause"></i></button>
+                    <button ng-click="updateList()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-cloud-download"></i> Update list</button>
+                    <button ng-click="exportJSON()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-download"></i> Export JSON</button>
+                    
+                    <table ng-table="serviceTable" class="uk-table">
+                        <caption>Services {{ .angular }} search.identifier }}</caption>
+                        <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{ .angular }} x.Output  }}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true">
+                            <td><i ng-show="x.Health == 2"  class="fa fa-times   uk-badge uk-badge-danger"></i>
+                                <i ng-show="x.Health == 1"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
+                                <i ng-show="x.Health == 0"  class="fa fa-check uk-badge uk-badge-success"></i>
+                                <i ng-show="x.Health < 0"   class="fa fa-circle-thin uk-badge"></i>
+                            </td>
+                            <td><i ng-show="x.enabled"  class="fa fa-play"></i><i ng-hide="x.enabled" class="fa fa-pause"></i></td>
+                            <td>{{ .angular }} x.identifier }}</td>
+                            <td>{{ .angular }} x.host  }}</td>
+                            <td>
+                                <i style="color: #0375d6;"   ng-show="x.Lock" class="fa fa-refresh fa-spin"></i>
+                                <i style="opacity: 0.1;" ng-hide="x.Lock" class="fa fa-refresh"></i>
+                            </td>
+                            <td>
+                                <small>{{ .angular }} x.RTime  }}ms</small>
+                                 <i ng-show="x.RTime > 1600"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
+                            </td>
+                            <td>{{ .angular }} x.interval  }}</td>
+                            <td>{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
+                            <td>{{ .angular }} mySplit(x.command,0) }}</td>
+                            <td><i ng-show="x.action == 'telegram'" class="fa fa-paper-plane"></i></td>
+                            <td><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
+                            <td><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <script src="/assets/js/angular/services.js"></script>
+
+        </div>
+    </body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+{{ template "head.html" }}
+
+<body ng-controller="MainCtrl">
+
+    {{ template "menu-open.html" }}
+    <li class="uk-parent" data-uk-dropdown="" aria-haspopup="true" aria-expanded="false">
+        <a href="" title="{{"{{"}} selectedHostIdentifier {{"}}"}}"><i class="fa fa-server"></i></a>
+        <div class="uk-dropdown uk-dropdown-navbar">
+            <ul class="uk-nav uk-nav-navbar">
+                <li ng-repeat="item in servers | orderBy:'-Identifier'" ng-show="item.Visible == true"><a ng-click="changeHost(item.HostID)">{{"{{"}} item.Identifier  {{"}}"}}</a>
+                </li>
+            </ul>
+        </div>
+
+    </li>
+    {{ template "auto-refresh.html" }}
+
+
+
+    {{ template "menu-close.html" }}
+    <div class="" style="padding: 30px">
+
+        <h1 style="font-size: calc(1em + 1vmin);">{{"{{"}} stats[0].Hostname  | uppercase {{"}}"}}</h1>
+
+        <div class="uk-grid" id="contentGrid">
+            <div class="uk-width-large-3-3 uk-width-medium-1-3">
+
+                <div class="uk-panel uk-panel-box" style="">
+
+                    <h3>Ping</h3>
+                    <div><div id="ping">ping</div></div>
+
+                </div>
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Load</h3>
+                    <div><div id="load">load</div></div>
+                </div>
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Load CPU</h3>
+                    <div><div id="loadcpu">loadcpu</div></div>
+                </div>
+                <!-- Coming soon -->
+                <div class="uk-panel uk-panel-box" style="display:none;"> 
+                    <h3>Load IO</h3>
+                    <div><div id="loadio">loadio</div></div>
+                </div>
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Memory</h3>
+                    <div><div id="ram">ram</div></div>
+                </div>
+
+                
+            </div>
+            <div class="uk-width-large-3-3 uk-width-medium-1-3">
+
+                <div class="uk-panel uk-panel-box">
+                    <a class="uk-panel-badge uk-badge" ng-click="getData()">Refresh</a>
+
+                    <h3 class="uk-panel-title">Info</h3>
+
+                    <dl class="uk-description-list-horizontal">
+
+                        <dt>Identifier</dt>
+                        <dd>{{"{{"}} selectedHostIdentifier {{"}}"}}&nbsp;</dd>
+
+                        <dt>Freq</dt>
+                        <dd>{{"{{"}} stats[0].Frequency {{"}}"}}s&nbsp;</dd>
+
+                        <dt>Next Update</dt>
+                        <dd><span id="nextUpdate">..</span>&nbsp;</dd>
+
+                        <dt>Connections</dt>
+                        <dd>{{"{{"}} stats[0].Connections {{"}}"}}&nbsp;</dd>
+
+                        <dt>Hostname</dt>
+                        <dd>{{"{{"}} stats[0].Hostname {{"}}"}}&nbsp;&nbsp;</dd>
+
+                        <dt>Latency</dt>
+                        <dd>{{"{{"}} stats[0].Ping {{"}}"}}&nbsp;</dd>
+
+                        <dt>NIC {{"{{"}} stats[0].SSID {{"}}"}}</dt>
+                        <dd>{{"{{"}} stats[0].Nic {{"}}"}}&nbsp;</dd>
+
+                        <dt>RX/TX</dt>
+                        <dd>{{"{{"}} stats[0].Rx /1024/1024 | number:2 {{"}}"}} / {{"{{"}} stats[0].Tx /1024/1024 | number:2 {{"}}"}}&nbsp;</dd>
+
+                        <dt>RX/TX Differences</dt>
+                        <dd>{{"{{"}} stats[0].Rxdiff {{"}}"}}/{{"{{"}} stats[0].Txdiff {{"}}"}}&nbsp;</dd>
+
+                        <dt>IPv4 ({{"{{"}} stats[0].Nic {{"}}"}})</dt>
+                        <dd>{{"{{"}} stats[0].Ipv4 {{"}}"}}&nbsp;</dd>
+
+                        <dt>IPv4 (public)</dt>
+                        <dd>{{"{{"}} stats[0].Ipv4Public {{"}}"}}&nbsp;</dd>
+
+                        <dt>IPv6</dt>
+                        <dd>{{"{{"}} stats[0].Ipv6 {{"}}"}}&nbsp;</dd>
+
+                        <dt>Operating System</dt>
+                        <dd>{{"{{"}} stats[0].Osname {{"}}"}} <small>{{"{{"}} stats[0].Osarch {{"}}"}}</small>&nbsp;</dd>
+
+                    </dl>
+                </div>
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Network</h3>
+                    <div>
+                      <div id="traffic">traffic</div>
+                    </div>
+                </div>
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Disk</h3>
+                    <div><div id="disk">disk</div></div>
+                </div>
+
+               
+
+
+            </div>
+            <div class="uk-width-large-3-3 uk-width-medium-1-3">
+
+                 <div class="uk-panel uk-panel-box">
+                    <h3 class="uk-panel-title">Attached services</h3>
+                    <table class="uk-table uk-table-hover" ng-show="services.length">
+                        <thead>
+                            <tr>
+                                <th>Identifier</th>
+                                <th>Health</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in services | orderBy:'identifier' | orderBy:'-Health' track by $index ">
+                                <td>{{"{{"}} x.identifier {{"}}"}}</td>
+                                <td><i ng-show="x.Health == 2" class="fa fa-times   uk-badge uk-badge-danger"></i>
+                                    <i ng-show="x.Health == 1" class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
+                                    <i ng-show="x.Health == 0" class="fa fa-check uk-badge uk-badge-success"></i>
+                                    <i ng-show="x.Health < 0" class="fa fa-circle-thin uk-badge"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="uk-panel uk-panel-box">
+                    <h3 class="uk-panel-title">Processes</h3>
+                    <table class="uk-table uk-table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>CPU</th>
+                                <th>RSS</th>
+                                <th>Process</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="p in processesng">
+                                <td>{{"{{"}} p.user {{"}}"}}</td>
+                                <td>{{"{{"}} p.cpu {{"}}"}}</td>
+                                <td>{{"{{"}} p.rss {{"}}"}}</td>
+                                <td>{{"{{"}} p.proc {{"}}"}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="pie"></div>
+                    <div id="piecpu"></div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <script src="/assets/js/angular/stats.js"></script>
+
+<!-- 
+        <button ng-click="buildGraphs()">Change data source</button>
+ -->
+
+
+</body>
+
+</html>
