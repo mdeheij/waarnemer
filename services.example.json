@@ -1,0 +1,19 @@
+[
+    {
+        "identifier": "github.web",
+        "host": "github.com",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 15,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "telegram",
+            "telegramtarget": [
+                9001,
+                -1337
+            ]
+        }
+    }
+]

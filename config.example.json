@@ -1,0 +1,29 @@
+{
+    "TelegramNotificationTarget": 0,
+    "TelegramBotToken": "",
+    "BaseFolder": "/opt/monitoring/",
+    "ServerAddress": "0.0.0.0",
+    "ServerPort": 4200,
+    "SecureCookieName": "pancakes",
+    "SecureCookie": "",
+    "AllowedUsers": [
+        "admin",
+        "root"
+    ],
+    "Cookieconfig": {
+        "Path": "/",
+        "Domain": "localhost",
+        "MaxAge": 86400,
+        "Secure": false,
+        "HttpOnly": true
+    },
+    "DatabaseConfig": {
+        "Username": "",
+        "Password": "",
+        "Database": "",
+        "Host": "",
+        "Port": "3306",
+        "Engine": "InnoDB",
+        "Encoding": "UTF-8"
+    }
+}
