@@ -1,3 +1,4 @@
+init/monitoringclient
 agent/agent-tempfile
 logs/
 config.json
