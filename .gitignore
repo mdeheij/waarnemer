@@ -1,0 +1,7 @@
+agent/agent-tempfile
+logs/
+config.json
+services.json
+monitoring
+client-daemon
+client-daemon/monitoringclientd

@@ -37,7 +37,7 @@ func loginInit(r *gin.Engine) {
 	*/
 	store := sessions.NewCookieStore([]byte(configuration.Config.SecureCookie))
 	store.Options(configuration.Config.CookieConfig)
-	r.Use(sessions.Sessions("GateSHSession", store))
+	r.Use(sessions.Sessions(configuration.Config.SecureCookieName, store))
 
 	//group := r.Group("/login")
 	group := r.Group("/login")
