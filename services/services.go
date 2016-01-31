@@ -3,9 +3,8 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mdeheij/monitoring/configuration"
 	"io/ioutil"
-	//	"reflect"
-	"git.gate.sh/mdeheij/monitoring/configuration"
 	"strconv"
 	"strings"
 	"time"

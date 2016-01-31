@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"git.gate.sh/mdeheij/monitoring/statistics"
 	"github.com/gin-gonic/gin"
+	"github.com/mdeheij/monitoring/statistics"
 	"github.com/satori/go.uuid"
 	"strconv"
 	"time"

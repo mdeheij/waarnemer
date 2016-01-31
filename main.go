@@ -5,11 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"git.gate.sh/mdeheij/monitoring/configuration"
-	"git.gate.sh/mdeheij/monitoring/statistics"
 	"github.com/bitly/go-simplejson"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/statistics"
 
 	"gopkg.in/gorp.v1"
 	//"io/ioutil"

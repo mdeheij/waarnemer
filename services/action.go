@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"git.gate.sh/mdeheij/monitoring/services/handlers"
+	"github.com/mdeheij/monitoring/services/handlers"
 	"strconv"
 	"time"
 )

@@ -3,10 +3,10 @@ package main
 import (
 	"crypto/sha512"
 	"fmt"
-	"git.gate.sh/mdeheij/monitoring/configuration"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/mdeheij/gotools"
+	"github.com/mdeheij/monitoring/configuration"
 	"strings"
 )
 

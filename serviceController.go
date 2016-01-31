@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"git.gate.sh/mdeheij/monitoring/services"
 	"github.com/gin-gonic/gin"
+	"github.com/mdeheij/monitoring/services"
 	"strconv"
 	"strings"
 )
