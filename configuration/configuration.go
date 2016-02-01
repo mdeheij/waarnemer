@@ -41,10 +41,11 @@ func Init() {
 		panic(err.Error())
 	}
 
-	json.Unmarshal(raw, &Config)
+	err = json.Unmarshal(raw, &Config)
 	if err != nil {
 		panic(err.Error())
 	}
+
 	name, err := os.Hostname()
 	if err != nil {
 		panic(err)
