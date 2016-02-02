@@ -1,77 +1,76 @@
 //var scope.stats;
 var Timer;
 var h1;
-google.charts.setOnLoadCallback(function() {
+/*google.charts.setOnLoadCallback(function() {
       angular.bootstrap(document.body, ['app']);
-});
-var app = angular.module('app', []);
-google.charts.load('current', {
-      'packages': ['line', 'corechart']
-});
+});*/
+var app = angular.module('myApp', ['ngOrderObjectBy']);
+
 
 
 app.controller('MainCtrl', function($scope, $http, $location) {
       var searchObject = $location.search();
-      $scope.graphOptions = {
-            chart: {
-                  curveType: 'function'
-            },
-            backgroundColor: {
-                  fill: 'transparent'
-            },
-            chartArea: {
-                  backgroundColor: {
-                        fill: 'transparent'
-                  }
-            },
-            height: 220,
-            axes: {
-                  x: {
-                        0: {
-                              side: 'top'
-                        }
-                  }
-            }
-      };
+     
       $scope.charts = [];
-      $scope.chartWidth = 900;
-      $scope.chartHeight = 320;
-      $scope.chartData = [];
-      $scope.chartData['traffic'] = [
-            [0, 6, 3],
-            [1, 1, 3],
-            [2, 8, 2],
-            [3, 3, 7],
-            [4, 1, 13],
-            [5, 9, 5],
-            [6, 9, 4]
-      ];
-      //$scope.chartData['traffic']  = getStatistics($scope, "traffic")
-      $scope.chartData['ping'] = [
-            [0, 70],
-            [1, 11],
-            [2, 4],
-            [2.3, 4],
-            [3, 4],
-            [4, 7],
-            [5, 7],
-            [6, 9]
-      ];
-      $scope.chartData['pie'] = [
-            ['Ad Flyers', 33],
-            ['Web (Organic)', 4],
-            ['Web (PPC)', 4],
-            ['Yellow Pages', 7],
-            ['Showroom', 3]
-      ];
+
+
+      $scope.abstractGraph = function (container, columns, type) {
+            var chart = c3.generate({
+                bindto: container,
+                data: {
+                  x: 'timestamp',
+                  xFormat: '%Y-%m-%d-%H-%M-%S',
+                  columns: columns,
+                  type : type, // 'line', 'spline', 'step', 'area', 'area-step' are also available to stack
+                },  
+                transition:  {duration: 0},
+                legend: {
+                  show: false
+                },
+                axis : {
+                    x : {
+                        type : 'timeseries',
+                        tick: {
+                              format: '   %H:%M:%S'
+                        },
+                    },
+                    y: {
+                      tick: {
+                       format: d3.format(',')
+                      }
+                    }
+
+                }
+            });
+      } 
+      $scope.trafficGraph = function () {
+            $scope.abstractGraph('#traffic', [getStatistics($scope, "timestamp"), getStatistics($scope, "RX"), getStatistics($scope, "TX")], 'area-spline');
+            $scope.abstractGraph('#disk', [getStatistics($scope, "timestamp"), getStatistics($scope, "Disk Total"), getStatistics($scope, "Disk Usage")], 'area-spline');
+            $scope.abstractGraph('#ram', [getStatistics($scope, "timestamp"), getStatistics($scope, "Memory Total"), getStatistics($scope, "Memory Usage")], 'area-spline');
+            $scope.abstractGraph('#ping', [getStatistics($scope, "timestamp"), getStatistics($scope, "ping")], 'spline');
+            $scope.abstractGraph('#io', [getStatistics($scope, "timestamp"), getStatistics($scope, "IO")], 'area-spline');
+            $scope.abstractGraph('#processPieCPU', $scope.processToPie(true), 'donut');
+            $scope.abstractGraph('#processPieRSS', $scope.processToPie(false), 'donut');
+            $scope.abstractGraph('#cpuGauge', [['timestamp', 0], ["CPU", $scope.latest.Loadcpu]], 'gauge');
+            $scope.abstractGraph('#loadGauge', [['timestamp', 0], ["Load", $scope.stats[0].Load.split(' ')[0]]], 'gauge');
+            $scope.abstractGraph('#memoryGauge', [['timestamp', 0], ["Memory", ($scope.latest.Ramusage/$scope.latest.Ramtotal)*100]], 'gauge');
+            $scope.abstractGraph('#cpu', [getStatistics($scope, "timestamp"), getStatistics($scope, "CPU")], 'spline');
+            $scope.abstractGraph('#load', [getStatistics($scope, "timestamp"), getStatistics($scope, "median"), getStatistics($scope, "loadShort"), getStatistics($scope, "loadMid"), getStatistics($scope, "loadLong")], 'spline');
+            //$scope.abstractGraph('#cpu', [getStatistics($scope, "RX"), getStatistics($scope, "TX")], 'area-spline');
+      }
       $scope.bouwGrafiek = function() {
             UIkit.notify("<i class='uk-icon-check'></i> Grafiek gebouwd! ");
       };
-      $scope.processToPie = function() {
-            var tempArray = [];
+      $scope.processToPie = function(cpu) {
+            var tempArray = [['timestamp', 0]];
             angular.forEach($scope.processesng, function(row) {
-                  tempArray.push([row.proc, parseFloat(row.rss)]);
+                  if (cpu) {
+                        tempArray.push([row.proc, parseFloat(row.cpu)]);
+                   } else {
+                        tempArray.push([row.proc, parseFloat(row.rss)]);
+                   }
             });
+            console.log(tempArray);
             return tempArray;
       }
       $scope.processToPieCPU = function() {
@@ -82,64 +81,10 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             return tempArray;
       }
 
-      function draw(target) {
-            if (target != undefined && $scope.charts[target] != undefined) {
-                  var data = $scope.charts[target].datatable;
-                  var label, value;
-                  data.removeRows(0, data.getNumberOfRows());
-                  angular.forEach($scope.chartData[target], function(row) {
-                        /*label = parseFloat(row[0]);
-                        value = parseFloat(row[1], 10);
-                        if (!isNaN(row[3])) {
-                        data.addRow([row[0], value, row[2], row[3]]);
-                        } else if (!isNaN(row[2])) {
-                        data.addRow([row[0], value, row[2]]);
-                        } else if (!isNaN(value)) {
-                        data.addRow([row[0], value]);
-                        }*/
-                        data.addRow(row);
-                  });
-                  var hoogte;
-                  if ($scope.charts[target].height != undefined) {
-                        hoogte = $scope.charts[target].height;
-                  } else {
-                        hoogte = 160;
-                  }
-                  var options = {
-                        'width': $scope.chartWidth,
-                        'height': hoogte,
-                        backgroundColor: {
-                              fill: 'transparent'
-                        },
-                        curveType: 'function',
-                        legend: {
-                              position: 'bottom'
-                        },
-                        chartArea: {
-                              left: 30,
-                              right: 10, // !!! works !!!
-                              bottom: 30, // !!! works !!!
-                              top: 30,
-                              backgroundColor: {
-                                    fill: 'transparent'
-                              }
-                        }
-                  };
-                  $scope.charts[target].graph.draw(data, options);
-            }
-      }
+    
       $scope.updateGraphs = function() {
-            draw("traffic");
-            draw("loadcpu");
-            //draw("loadio");
-            draw("load");
-            //DEBUG-console.log("[updateGraphs] -> 13:10 ");
-            //DEBUG-console.log(getStatistics($scope, "load"));
-            draw("ram");
-            draw("disk");
-            draw("ping");
-            draw("pie");
-            draw("piecpu");
+
+            $scope.trafficGraph();
       }
       $scope.$watch('chartData.traffic', function() {
             $scope.updateGraphs()
@@ -163,8 +108,9 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             }
       }, 1000);
       $scope.buildGraphs = function() {
+
             // Create the data table and instantiate the chart
-            var data = new google.visualization.DataTable();
+            /*var data = new google.visualization.DataTable();
             data.addColumn('datetime', 'Time');
             data.addColumn('number', '▼ RX (MB)');
             data.addColumn('number', '▲ TX (MB)');
@@ -227,7 +173,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             $scope.charts['pie'] = [];
             $scope.charts['pie'].datatable = data;
             $scope.charts['pie'].height = 350;
-            $scope.charts['pie'].graph = new google.visualization.PieChart(document.getElementById('pie'));
+            $scope.charts['pie'].graph = new google.visualization.PieChart(document.getElementById('pie'));*/
       }
       $scope.init = function() {
             $http.get("/stats/server/list").then(function(response) {
@@ -276,7 +222,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                         //DEBUG-console.log($scope.chartData['traffic']);
                         //DEBUG-console.log(getStatistics($scope, "traffic"));
                         //DEBUG-console.log("/getdatadebug");
-                        $scope.chartData['traffic'] = getStatistics($scope, "traffic");
+                    /*    $scope.chartData['traffic'] = getStatistics($scope, "traffic");
                         $scope.chartData['loadcpu'] = getStatistics($scope, "loadcpu");
                         $scope.chartData['loadio'] = getStatistics($scope, "loadio");
                         $scope.chartData['load'] = getStatistics($scope, "load");
@@ -284,7 +230,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                         $scope.chartData['ram'] = getStatistics($scope, "ram");
                         $scope.chartData['ping'] = getStatistics($scope, "ping");
                         $scope.chartData['pie'] = $scope.processToPie();
-                        $scope.chartData['piecpu'] = $scope.processToPieCPU();
+                        $scope.chartData['piecpu'] = $scope.processToPieCPU();*/
                         $scope.updateGraphs();
                         $http.get("/services/list/" + $scope.selectedHostIdentifier).then(function(response) {
                               //DEBUG-console.log("Got services!");
@@ -335,33 +281,75 @@ app.controller('MainCtrl', function($scope, $http, $location) {
       $scope.direction = false;
 
       function getStatistics($scope, attr) {
-            var tempArray = [];
+            var tempArray = [attr];
             var historycount = 25;
             for (var i = 0; i < historycount; i++) {
                   var c = historycount - i - 1;
                   var timestamp = new Date($scope.stats[i].Date * 1000);
                   switch (attr) {
+                         case "timestamp":
+                              //var formatted = timestamp.toString();
+                              var date = timestamp;
+                              var year = date.getFullYear();
+                              var month = date.getMonth() + 1;
+                              var day = date.getDate();
+                              var hours = date.getHours();
+                              var minutes = date.getMinutes();
+                              var seconds = date.getSeconds();
+                              var formatted = year + "-" + month + "-" + day + "-" + hours + "-" + minutes+ "-" + seconds;
+                              //var formatted = "2015-05-20-05-10-13";
+                              //console.log(formatted);
+
+                              tempArray.push(formatted);
+                              break;
                         case "traffic":
                               tempArray.push([timestamp, parseFloat($scope.stats[i].Rxdiff / 1024 / 1024), parseFloat($scope.stats[i].Txdiff / 1024 / 1024)]);
                               break;
-                        case "loadcpu":
-                              tempArray.push([timestamp, parseFloat($scope.stats[i].Loadcpu)]);
+                        case "median":
+                              tempArray.push(1);
+                              break;
+                        case "RX":
+                              tempArray.push(parseFloat(Math.round($scope.stats[i].Rxdiff / 1024) / 1024));
+                              break;
+                        case "TX":
+                              tempArray.push(parseFloat(Math.round($scope.stats[i].Txdiff / 1024) / 1024));
+                              break;
+                        case "CPU":
+                              tempArray.push(parseFloat($scope.stats[i].Loadcpu));
                               break;
                         case "loadio":
                               tempArray.push([timestamp, parseFloat($scope.stats[i].Loadio)]);
                               break;
-                        case "load":
+                        case "loadShort":
                               loadNumber = $scope.stats[i].Load.split(' ');
-                              tempArray.push([timestamp, 1, parseFloat(loadNumber[0]), parseFloat(loadNumber[1]), parseFloat(loadNumber[2])]);
+                              tempArray.push(parseFloat(loadNumber[0]));
                               break;
-                        case "ram":
-                              tempArray.push([timestamp, parseFloat($scope.stats[i].Ramtotal / 1024 / 1024), parseFloat($scope.stats[i].Ramusage / 1024 / 1024)]);
+                        case "loadMid":
+                              loadNumber = $scope.stats[i].Load.split(' ');
+                              tempArray.push(parseFloat(loadNumber[1]));
                               break;
-                        case "disk":
-                              tempArray.push([timestamp, 0, parseFloat($scope.stats[i].Diskusage / 1024 / 1024 / 1024), parseFloat($scope.stats[i].Disktotal / 1024 / 1024 / 1024)]);
+                        case "loadLong":
+                              loadNumber = $scope.stats[i].Load.split(' ');
+                              tempArray.push(parseFloat(loadNumber[2]));
+                              break;
+                        case "Memory Total":
+                              tempArray.push(parseFloat($scope.stats[i].Ramtotal / 1024 / 1024));
+                              break;
+                        case "Memory Usage":
+                              tempArray.push(parseFloat($scope.stats[i].Ramusage / 1024 / 1024));
+                              break;
+                        case "Disk Usage":
+                              tempArray.push(Math.round(parseFloat($scope.stats[i].Diskusage / 1024 / 1024 / 1024)*10)/10);
+                              break;
+                        case "Disk Total":
+                              tempArray.push(Math.round(parseFloat($scope.stats[i].Disktotal / 1024 / 1024 / 1024)*10)/10);
                               break;
                         case "ping":
-                              tempArray.push([timestamp, parseFloat(Math.round($scope.stats[i].Ping))]);
+                              tempArray.push(parseFloat(Math.round($scope.stats[i].Ping)));
+                              break;
+                        case "IO":
+                              console.log("IO", parseFloat($scope.stats[i].Loadio));
+                              tempArray.push(parseFloat($scope.stats[i].Loadio));
                               break;
                         default:
                               tempArray.push([c, $scope.stats[i][attr]]);
