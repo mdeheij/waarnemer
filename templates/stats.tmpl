@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="myApp">
+
 {{ template "head.html" }}
 
 <body ng-controller="MainCtrl">
@@ -29,27 +30,29 @@
 
                 <div class="uk-panel uk-panel-box" style="">
 
-                    <h3>Ping</h3>
-                    <div><div id="ping">ping</div></div>
+                    <h3>Ping (ms)</h3>
+                    <div><div id="ping" style="height: 170px;">ping</div></div>
 
                 </div>
                 <div class="uk-panel uk-panel-box" style="">
                     <h3>Load</h3>
-                    <div><div id="load">load</div></div>
+                    <div><div id="load" style="height: 200px;"></div></div>
                 </div>
                 <div class="uk-panel uk-panel-box" style="">
-                    <h3>Load CPU</h3>
-                    <div><div id="loadcpu">loadcpu</div></div>
+                    <h3>Memory (MB)</h3>
+                    <div><div id="ram" style="height: 160px;">ram</div></div>
                 </div>
-                <!-- Coming soon -->
-                <div class="uk-panel uk-panel-box" style="display:none;"> 
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Load CPU %</h3>
+                    <div></div>
+                    <div><div id="cpu" style="height: 160px;"></div></div>
+                    
+                </div>
+                <div class="uk-panel uk-panel-box"> 
                     <h3>Load IO</h3>
-                    <div><div id="loadio">loadio</div></div>
+                    <div><div id="io" style="height: 100px;"></div></div>
                 </div>
-                <div class="uk-panel uk-panel-box" style="">
-                    <h3>Memory</h3>
-                    <div><div id="ram">ram</div></div>
-                </div>
+               
 
                 
             </div>
@@ -57,7 +60,7 @@
 
                 <div class="uk-panel uk-panel-box">
                     <a class="uk-panel-badge uk-badge" ng-click="getData()">Refresh</a>
-
+                    
                     <h3 class="uk-panel-title">Info</h3>
 
                     <dl class="uk-description-list-horizontal">
@@ -102,26 +105,41 @@
                         <dd>{{"{{"}} stats[0].Osname {{"}}"}} <small>{{"{{"}} stats[0].Osarch {{"}}"}}</small>&nbsp;</dd>
 
                     </dl>
+                    <div></div>
+
+                   
                 </div>
                 <div class="uk-panel uk-panel-box" style="">
-                    <h3>Network</h3>
+                    <h3>Network (MB)</h3>
                     <div>
-                      <div id="traffic">traffic</div>
+                      <div id="traffic" style="height: 160px;"></div>
                     </div>
                 </div>
                 <div class="uk-panel uk-panel-box" style="">
-                    <h3>Disk</h3>
-                    <div><div id="disk">disk</div></div>
+                    <h3>Disk (GB)</h3>
+                    <div><div id="disk" style="height: 160px;">disk</div></div>
                 </div>
 
                
 
 
             </div>
-            <div class="uk-width-large-3-3 uk-width-medium-1-3">
+            <div class="uk-width-large-3-3 uk-width-medium-1-3 uk-sortable" data-uk-sortable>
 
                  <div class="uk-panel uk-panel-box">
-                    <h3 class="uk-panel-title">Attached services</h3>
+    
+                     <table style="width:100%; text-align: center;">
+                        <tr>
+                            <td width="33%">CPU<div id="cpuGauge" style="height: 87px;"></div></td>
+                            <td width="33%">LOAD<div id="loadGauge" style="height: 87px;"></div></td>
+                            <td width="33%">RAM<div id="memoryGauge" style="height: 87px;"></div></td>
+                        </tr>
+                    </table>
+                </div>
+
+                 <div class="uk-panel uk-panel-box" ng-show="services.length">
+
+                    <h3 class="uk-panel-title" >Attached services</h3>
                     <table class="uk-table uk-table-hover" ng-show="services.length">
                         <thead>
                             <tr>
@@ -130,7 +148,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="x in services | orderBy:'identifier' | orderBy:'-Health' track by $index ">
+                            <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{"{{"}} x.Output  {{"}}"}}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true">
                                 <td>{{"{{"}} x.identifier {{"}}"}}</td>
                                 <td><i ng-show="x.Health == 2" class="fa fa-times   uk-badge uk-badge-danger"></i>
                                     <i ng-show="x.Health == 1" class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
@@ -144,6 +162,12 @@
 
                 <div class="uk-panel uk-panel-box">
                     <h3 class="uk-panel-title">Processes</h3>
+                    <table style="width:100%; text-align: center;">
+                        <tr>
+                            <td width="50%">CPU <div id="processPieCPU"></div></td>
+                            <td width="50%">RSS <div id="processPieRSS"></div></td>
+                        </tr>
+                    </table>
                     <table class="uk-table uk-table-hover">
                         <thead>
                             <tr>
@@ -162,16 +186,18 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div id="pie"></div>
-                    <div id="piecpu"></div>
+                    
+                   
+                   
                 </div>
 
 
             </div>
         </div>
 
-        <script src="/assets/js/angular/stats.js"></script>
 
+       <script src="/assets/js/angular/stats-dev.js"></script>
+      
 <!-- 
         <button ng-click="buildGraphs()">Change data source</button>
  -->
