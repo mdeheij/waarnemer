@@ -70,7 +70,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                         tempArray.push([row.proc, parseFloat(row.rss)]);
                    }
             });
-            console.log(tempArray);
+            //DEBUG-console.log(tempArray);
             return tempArray;
       }
       $scope.processToPieCPU = function() {
@@ -100,10 +100,20 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             var nextUpdate = Math.round($scope.stats[0].Frequency + 2 - timeDiff);
             if (nextUpdate > 0) {
                   $("#nextUpdate").html(nextUpdate);
+                  var percentageUpdate = 100-((nextUpdate / $scope.stats[0].Frequency) * 100);
+                  //DEBUG-console.log("percentageUpdate: "+percentageUpdate);
+                  $("#nextUpdateBar").width(percentageUpdate+"%");
+                  $("#nextUpdateBar").parent().removeClass( "uk-progress-danger" );
+
+
             } else if (nextUpdate <= 0 && nextUpdate > -10) {
-                  $("#nextUpdate").html("Expecting..");
+                  //$("#nextUpdate").html("Expecting..");
+
+
                   $scope.getData();
             } else {
+                   $("#nextUpdateBar").width("100%");
+                  $("#nextUpdateBar").parent().addClass( "uk-progress-danger" );
                   $("#nextUpdate").html("<strong>Not responding!</strong>");
             }
       }, 1000);
@@ -348,7 +358,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                               tempArray.push(parseFloat(Math.round($scope.stats[i].Ping)));
                               break;
                         case "IO":
-                              console.log("IO", parseFloat($scope.stats[i].Loadio));
+                              //DEBUG-console.log("IO", parseFloat($scope.stats[i].Loadio));
                               tempArray.push(parseFloat($scope.stats[i].Loadio));
                               break;
                         default:
