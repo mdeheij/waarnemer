@@ -71,9 +71,6 @@
                         <dt>Freq</dt>
                         <dd>{{"{{"}} stats[0].Frequency {{"}}"}}s&nbsp;</dd>
 
-                        <dt>Next Update</dt>
-                        <dd><span id="nextUpdate">..</span>&nbsp;</dd>
-
                         <dt>Connections</dt>
                         <dd>{{"{{"}} stats[0].Connections {{"}}"}}&nbsp;</dd>
 
@@ -135,6 +132,9 @@
                             <td width="33%">RAM<div id="memoryGauge" style="height: 87px;"></div></td>
                         </tr>
                     </table>
+                    <div title="Next update" class="uk-progress uk-progress-mini uk-progress-striped uk-active">
+    <div class="uk-progress-bar" id="nextUpdateBar" style="width: 0%;"></div>
+</div>
                 </div>
 
                  <div class="uk-panel uk-panel-box" ng-show="services.length">
