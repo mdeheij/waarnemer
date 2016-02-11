@@ -1,9 +1,7 @@
 //var scope.stats;
 var Timer;
 var h1;
-/*google.charts.setOnLoadCallback(function() {
-      angular.bootstrap(document.body, ['app']);
-});*/
+
 var app = angular.module('myApp', ['ngOrderObjectBy']);
 
 
@@ -48,7 +46,19 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             $scope.abstractGraph('#disk', [getStatistics($scope, "timestamp"), getStatistics($scope, "Disk Total"), getStatistics($scope, "Disk Usage")], 'area-spline');
             $scope.abstractGraph('#ram', [getStatistics($scope, "timestamp"), getStatistics($scope, "Memory Total"), getStatistics($scope, "Memory Usage")], 'area-spline');
             $scope.abstractGraph('#ping', [getStatistics($scope, "timestamp"), getStatistics($scope, "ping")], 'spline');
-            $scope.abstractGraph('#io', [getStatistics($scope, "timestamp"), getStatistics($scope, "IO")], 'area-spline');
+            
+            ioData = getStatistics($scope, "IO");
+
+            for (var i = 0; i < ioData.length; i++) {
+                  if (ioData[i] > 0) {
+                        console.log("GROTER DAN 0 DUS RETURN: "+ioData[i]);
+                        $scope.abstractGraph('#io', [getStatistics($scope, "timestamp"), ioData], 'area-spline');
+                        return;
+                  } else  {
+                        $("#io").html("Nothing interesting happend.");
+                  }
+            }
+
             $scope.abstractGraph('#processPieCPU', $scope.processToPie(true), 'donut');
             $scope.abstractGraph('#processPieRSS', $scope.processToPie(false), 'donut');
             $scope.abstractGraph('#cpuGauge', [['timestamp', 0], ["CPU", $scope.latest.Loadcpu]], 'gauge');
@@ -58,9 +68,6 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             $scope.abstractGraph('#load', [getStatistics($scope, "timestamp"), getStatistics($scope, "median"), getStatistics($scope, "loadShort"), getStatistics($scope, "loadMid"), getStatistics($scope, "loadLong")], 'spline');
             //$scope.abstractGraph('#cpu', [getStatistics($scope, "RX"), getStatistics($scope, "TX")], 'area-spline');
       }
-      $scope.bouwGrafiek = function() {
-            UIkit.notify("<i class='uk-icon-check'></i> Grafiek gebouwd! ");
-      };
       $scope.processToPie = function(cpu) {
             var tempArray = [['timestamp', 0]];
             angular.forEach($scope.processesng, function(row) {
@@ -82,8 +89,10 @@ app.controller('MainCtrl', function($scope, $http, $location) {
       }
 
     
+      $scope.buildModal = function() {
+            UIkit.modal('#graphContainerModal').show();
+      }    
       $scope.updateGraphs = function() {
-
             $scope.trafficGraph();
       }
       $scope.$watch('chartData.traffic', function() {
@@ -117,74 +126,6 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                   $("#nextUpdate").html("<strong>Not responding!</strong>");
             }
       }, 1000);
-      $scope.buildGraphs = function() {
-
-            // Create the data table and instantiate the chart
-            /*var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', '▼ RX (MB)');
-            data.addColumn('number', '▲ TX (MB)');
-            $scope.charts['traffic'] = [];
-            $scope.charts['traffic'].datatable = data;
-            $scope.charts['traffic'].graph = new google.visualization.LineChart(document.getElementById('traffic'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Latency (ms)');
-            $scope.charts['ping'] = [];
-            $scope.charts['ping'].datatable = data;
-            $scope.charts['ping'].height = 180;
-            $scope.charts['ping'].graph = new google.visualization.LineChart(document.getElementById('ping'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Load %');
-            $scope.charts['loadcpu'] = [];
-            $scope.charts['loadcpu'].datatable = data;
-            $scope.charts['loadcpu'].graph = new google.visualization.LineChart(document.getElementById('loadcpu'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Load %');
-            $scope.charts['loadio'] = [];
-            $scope.charts['loadio'].datatable = data;
-            $scope.charts['loadio'].graph = new google.visualization.LineChart(document.getElementById('loadio'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Median');
-            data.addColumn('number', 'Short');
-            data.addColumn('number', 'Mid');
-            data.addColumn('number', 'Long');
-            $scope.charts['load'] = [];
-            $scope.charts['load'].datatable = data;
-            $scope.charts['load'].graph = new google.visualization.LineChart(document.getElementById('load'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Total');
-            data.addColumn('number', 'Usage');
-            $scope.charts['ram'] = [];
-            $scope.charts['ram'].datatable = data;
-            $scope.charts['ram'].graph = new google.visualization.AreaChart(document.getElementById('ram'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            data.addColumn('number', 'Zero');
-            data.addColumn('number', 'Usage (GB)');
-            data.addColumn('number', 'Total (GB)');
-            $scope.charts['disk'] = [];
-            $scope.charts['disk'].datatable = data;
-            $scope.charts['disk'].graph = new google.visualization.AreaChart(document.getElementById('disk'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Label');
-            data.addColumn('number', 'Value');
-            $scope.charts['piecpu'] = [];
-            $scope.charts['piecpu'].datatable = data;
-            $scope.charts['piecpu'].height = 300;
-            $scope.charts['piecpu'].graph = new google.visualization.PieChart(document.getElementById('piecpu'));
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Label');
-            data.addColumn('number', 'Value');
-            $scope.charts['pie'] = [];
-            $scope.charts['pie'].datatable = data;
-            $scope.charts['pie'].height = 350;
-            $scope.charts['pie'].graph = new google.visualization.PieChart(document.getElementById('pie'));*/
-      }
       $scope.init = function() {
             $http.get("/stats/server/list").then(function(response) {
                   $scope.servers = response.data;
@@ -193,7 +134,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                   } else {
                         $scope.changeHost(searchObject['hostID']);
                   }
-                  $scope.buildGraphs();
+                  //$scope.buildGraphs();
             });
       }
       $scope.changeHost = function(hostID) {
@@ -223,28 +164,10 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                         $scope.processes = response.data.obj[0].Processesarray.split(";");
                         $scope.processesng = processesSplit(response.data.obj[0].Processesarray);
                         $scope.selectedHostIdentifier = response.data.identifier;
-                        //DEBUG-console.log("GRAFEGESRGE"+response.data.identifier);
-                        //DEBUG-console.log("OKEE");
-                        //DEBUG-console.log(response.data);
                         $scope.stats = response.data.obj;
                         $scope.latest = response.data.obj[0];
-                        //DEBUG-console.log("getdatadebug");
-                        //DEBUG-console.log($scope.chartData['traffic']);
-                        //DEBUG-console.log(getStatistics($scope, "traffic"));
-                        //DEBUG-console.log("/getdatadebug");
-                    /*    $scope.chartData['traffic'] = getStatistics($scope, "traffic");
-                        $scope.chartData['loadcpu'] = getStatistics($scope, "loadcpu");
-                        $scope.chartData['loadio'] = getStatistics($scope, "loadio");
-                        $scope.chartData['load'] = getStatistics($scope, "load");
-                        $scope.chartData['disk'] = getStatistics($scope, "disk");
-                        $scope.chartData['ram'] = getStatistics($scope, "ram");
-                        $scope.chartData['ping'] = getStatistics($scope, "ping");
-                        $scope.chartData['pie'] = $scope.processToPie();
-                        $scope.chartData['piecpu'] = $scope.processToPieCPU();*/
                         $scope.updateGraphs();
                         $http.get("/services/list/" + $scope.selectedHostIdentifier).then(function(response) {
-                              //DEBUG-console.log("Got services!");
-                              //DEBUG-console.log(response);
                               $scope.services = response.data;
                         });
                   } else {
@@ -359,6 +282,8 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                               break;
                         case "IO":
                               //DEBUG-console.log("IO", parseFloat($scope.stats[i].Loadio));
+                              var FiftyFifty = Math.round(Math.random());
+                              //tempArray.push(parseFloat($scope.stats[i].Loadio+FiftyFifty));
                               tempArray.push(parseFloat($scope.stats[i].Loadio));
                               break;
                         default:
@@ -394,6 +319,8 @@ function henkfietspop() {
       //h1.setViewBox(0,0,$('#chart1').parent().width(),200,false);
       //DEBUG-console.log($('#chart1').parent().width(), 200);
 }
+
+
 /*
 angular.filter('orderObjectBy', function () {
     return function (items, field, reverse) {

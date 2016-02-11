@@ -21,43 +21,22 @@
 
 
     {{ template "menu-close.html" }}
+
+    <!-- This is the modal -->
+<div id="graphContainerModal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <div id="graphContainerModalDraw"></div>
+    </div>
+</div>
+    
+
     <div class="" style="padding: 30px">
 
         <h1 style="font-size: calc(1em + 1vmin);">{{"{{"}} stats[0].Hostname  | uppercase {{"}}"}}</h1>
 
         <div class="uk-grid" id="contentGrid">
             <div class="uk-width-large-3-3 uk-width-medium-1-3">
-                <div class="uk-panel uk-panel-box" style="">
-                    <h3>Network (MB)</h3>
-                    <div>
-                      <div id="traffic" style="height: 160px;"></div>
-                    </div>
-                </div>
-                
-                <div class="uk-panel uk-panel-box" style="">
-                    <h3>Load</h3>
-                    <div><div id="load" style="height: 200px;"></div></div>
-                </div>
-                <div class="uk-panel uk-panel-box" style="">
-                    <h3>Memory (MB)</h3>
-                    <div><div id="ram" style="height: 160px;">ram</div></div>
-                </div>
-                <div class="uk-panel uk-panel-box" style="">
-                    <h3>Load CPU %</h3>
-                    <div></div>
-                    <div><div id="cpu" style="height: 160px;"></div></div>
-                    
-                </div>
-                <div class="uk-panel uk-panel-box"> 
-                    <h3>Load IO</h3>
-                    <div><div id="io" style="height: 100px;"></div></div>
-                </div>
-               
-
-                
-            </div>
-            <div class="uk-width-large-3-3 uk-width-medium-1-3">
-
                 <div class="uk-panel uk-panel-box">
                     <a class="uk-panel-badge uk-badge" ng-click="getData()">Refresh</a>
                     
@@ -107,13 +86,50 @@
                    
                 </div>
 
+
+
                 <div class="uk-panel uk-panel-box" style="">
+                    <h3 class="uk-panel-title">Load</h3>
+                    <div class="uk-accordion" data-uk-accordion>
 
-                    <h3>Ping (ms)</h3>
-                    <div><div id="ping" style="height: 170px;">ping</div></div>
+                        <h3 class="uk-accordion-title">System load</h3>
+                        <div class="uk-accordion-content"><div><div id="load" style="height: 200px;"></div></div></div>
 
+                        <h3 class="uk-accordion-title">CPU %</h3>
+                        <div class="uk-accordion-content"><div id="cpu" style="height: 200px;"></div></div>
+
+                        <h3 class="uk-accordion-title">IO</h3>
+                        <div class="uk-accordion-content"><div id="io" style="height: 100px;"></div></div>
+
+                    </div>
                 </div>
                 
+
+                
+            </div>
+            <div class="uk-width-large-3-3 uk-width-medium-1-3">
+    
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3 class="uk-panel-title">Networking</h3>
+                    <div>
+                      
+                    </div>
+                    <div class="uk-accordion" data-uk-accordion>
+
+                        <h3 class="uk-accordion-title">Traffic</h3>
+                        <div class="uk-accordion-content"><div id="traffic" style="height: 200px;"></div></div>
+
+                        <h3 class="uk-accordion-title">Ping</h3>
+                        <div class="uk-accordion-content"><div id="ping" style="height: 170px;">ping</div></div>
+
+                    </div>
+                </div>
+
+                <div class="uk-panel uk-panel-box" style="">
+                    <h3>Memory (MB)</h3>
+                    <div><div id="ram" style="height: 160px;">ram</div></div>
+                </div>
+
                 <div class="uk-panel uk-panel-box" style="">
                     <h3>Disk (GB)</h3>
                     <div><div id="disk" style="height: 160px;">disk</div></div>
@@ -125,9 +141,11 @@
             </div>
             <div class="uk-width-large-3-3 uk-width-medium-1-3 uk-sortable" data-uk-sortable>
 
+                
+
                  <div class="uk-panel uk-panel-box">
-    
-                     <table style="width:100%; text-align: center;">
+
+                     <table id="gauges" style="width:100%; text-align: center;">
                         <tr>
                             <td width="33%">CPU<div id="cpuGauge" style="height: 87px;"></div></td>
                             <td width="33%">LOAD<div id="loadGauge" style="height: 87px;"></div></td>

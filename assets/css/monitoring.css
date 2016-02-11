@@ -13,3 +13,22 @@ opacity: 0.4;
 .lines path {
 stroke-width: 3px;
 }
+#monitoring-top-nav{
+	background: #fff;
+	color: #000;
+	border-bottom: #08c 1px solid;
+}
+#monitoring-top-nav li a{
+	color: #000;
+}
+ #monitoring-top-nav .uk-navbar-nav > li:hover > a, .uk-navbar-nav > li > a:focus, .uk-navbar-nav > li.uk-open > a{
+	background-color: #1572ea;
+	color: #fff;
+}  
+#monitoring-top-nav .uk-navbar-nav > li:hover > #logo {
+	background-color: #0fa;
+	-webkit-filter: invert(100%);
+    filter: invert(100%);
+} 
+/* #gauges td  { transition: all .2s ease-in-out; }
+#gauges td:hover  { transform: scale(1.1); background-color: #eee; } */
