@@ -7,7 +7,7 @@
 
     {{ template "menu-open.html" }}
     <li class="uk-parent" data-uk-dropdown="" aria-haspopup="true" aria-expanded="false">
-        <a href="" title="{{"{{"}} selectedHostIdentifier {{"}}"}}"><i class="fa fa-server"></i></a>
+        <a href="" title="{{"{{"}} selectedHostIdentifier {{"}}"}}"><i class="fa fa-server"></i> Switch server</a>
         <div class="uk-dropdown uk-dropdown-navbar">
             <ul class="uk-nav uk-nav-navbar">
                 <li ng-repeat="item in servers | orderBy:'-Identifier'" ng-show="item.Visible == true"><a ng-click="changeHost(item.HostID)">{{"{{"}} item.Identifier  {{"}}"}}</a>
@@ -29,7 +29,7 @@
         <div id="graphContainerModalDraw"></div>
     </div>
 </div>
-    
+
 
     <div class="" style="padding: 30px">
 
@@ -39,7 +39,7 @@
             <div class="uk-width-large-3-3 uk-width-medium-1-3">
                 <div class="uk-panel uk-panel-box">
                     <a class="uk-panel-badge uk-badge" ng-click="getData()">Refresh</a>
-                    
+
                     <h3 class="uk-panel-title">Info</h3>
 
                     <dl class="uk-description-list-horizontal">
@@ -83,7 +83,7 @@
                     </dl>
                     <div></div>
 
-                   
+
                 </div>
 
 
@@ -103,16 +103,16 @@
 
                     </div>
                 </div>
-                
 
-                
+
+
             </div>
             <div class="uk-width-large-3-3 uk-width-medium-1-3">
-    
+
                 <div class="uk-panel uk-panel-box" style="">
                     <h3 class="uk-panel-title">Networking</h3>
                     <div>
-                      
+
                     </div>
                     <div class="uk-accordion" data-uk-accordion>
 
@@ -135,13 +135,13 @@
                     <div><div id="disk" style="height: 160px;">disk</div></div>
                 </div>
 
-               
+
 
 
             </div>
             <div class="uk-width-large-3-3 uk-width-medium-1-3 uk-sortable" data-uk-sortable>
 
-                
+
 
                  <div class="uk-panel uk-panel-box">
 
@@ -206,9 +206,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    
-                   
-                   
+
+
+
                 </div>
 
 
@@ -217,8 +217,8 @@
 
 
        <script src="/assets/js/angular/stats.js"></script>
-      
-<!-- 
+
+<!--
         <button ng-click="buildGraphs()">Change data source</button>
  -->
 

@@ -9,18 +9,18 @@
           {{ template "auto-refresh.html" }}
           {{ template "menu-close.html" }}
 
-            
+
             <div style="padding-top: 50px">
 
-    
+
                 <div class="uk-container uk-container-center">
                     <h1>Services</h1>
                     <!--  <h2>{{ .angular }} statusMsg }}</h2> -->
                     <button ng-click="start()" class="uk-button uk-button-large uk-button-success" type="submit"><i class="fa fa-play"></i></button>
                     <button ng-click="stop()" class="uk-button uk-button-large uk-button-danger" type="submit"><i class="fa fa-pause"></i></button>
                     <button ng-click="updateList()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-cloud-download"></i> Update list</button>
-                    <button ng-click="exportJSON()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-download"></i> Export JSON</button>
-                    
+                    <!-- NOT IMPLEMENTED YET <button ng-click="exportJSON()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-download"></i> Export JSON</button> -->
+
                     <table ng-table="serviceTable" class="uk-table">
                         <caption>Services {{ .angular }} search.identifier }}</caption>
                         <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{ .angular }} x.Output  }}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true">
