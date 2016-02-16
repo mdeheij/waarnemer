@@ -259,9 +259,16 @@ func getServices() []Service {
 	raw, err := ioutil.ReadFile(configuration.Config.BaseFolder + "services.json")
 	if err != nil {
 		panic(err)
+	} else {
+		fmt.Println("DEBUG REALLY VERBOSE")
+		fmt.Println()
+		fmt.Println(string(raw))
 	}
 
 	var s []Service
-	json.Unmarshal(raw, &s)
+	errUnmarshal := json.Unmarshal(raw, &s)
+	if errUnmarshal != nil {
+		panic(err)
+	}
 	return s
 }

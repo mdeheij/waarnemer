@@ -8,7 +8,7 @@ var app = angular.module('myApp', ['ngOrderObjectBy']);
 
 app.controller('MainCtrl', function($scope, $http, $location) {
       var searchObject = $location.search();
-     
+
       $scope.charts = [];
 
 
@@ -20,7 +20,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
                   xFormat: '%Y-%m-%d-%H-%M-%S',
                   columns: columns,
                   type : type, // 'line', 'spline', 'step', 'area', 'area-step' are also available to stack
-                },  
+                },
                 transition:  {duration: 0},
                 legend: {
                   show: false
@@ -40,24 +40,14 @@ app.controller('MainCtrl', function($scope, $http, $location) {
 
                 }
             });
-      } 
+      }
       $scope.trafficGraph = function () {
             $scope.abstractGraph('#traffic', [getStatistics($scope, "timestamp"), getStatistics($scope, "RX"), getStatistics($scope, "TX")], 'area-spline');
             $scope.abstractGraph('#disk', [getStatistics($scope, "timestamp"), getStatistics($scope, "Disk Total"), getStatistics($scope, "Disk Usage")], 'area-spline');
             $scope.abstractGraph('#ram', [getStatistics($scope, "timestamp"), getStatistics($scope, "Memory Total"), getStatistics($scope, "Memory Usage")], 'area-spline');
             $scope.abstractGraph('#ping', [getStatistics($scope, "timestamp"), getStatistics($scope, "ping")], 'spline');
-            
-            ioData = getStatistics($scope, "IO");
 
-            for (var i = 0; i < ioData.length; i++) {
-                  if (ioData[i] > 0) {
-                        console.log("GROTER DAN 0 DUS RETURN: "+ioData[i]);
-                        $scope.abstractGraph('#io', [getStatistics($scope, "timestamp"), ioData], 'area-spline');
-                        return;
-                  } else  {
-                        $("#io").html("Nothing interesting happend.");
-                  }
-            }
+            
 
             $scope.abstractGraph('#processPieCPU', $scope.processToPie(true), 'donut');
             $scope.abstractGraph('#processPieRSS', $scope.processToPie(false), 'donut');
@@ -88,12 +78,16 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             return tempArray;
       }
 
-    
+
       $scope.buildModal = function() {
             UIkit.modal('#graphContainerModal').show();
-      }    
+      }
       $scope.updateGraphs = function() {
-            $scope.trafficGraph();
+          console.log("[UpdateGraphs] called");
+            if ($scope.latest != undefined) {
+                console.log("[UpdateGraphs] proceeded, "+$scope.latest.Loadcpu);
+                $scope.trafficGraph();
+            }
       }
       $scope.$watch('chartData.traffic', function() {
             $scope.updateGraphs()
@@ -216,79 +210,85 @@ app.controller('MainCtrl', function($scope, $http, $location) {
       function getStatistics($scope, attr) {
             var tempArray = [attr];
             var historycount = 25;
-            for (var i = 0; i < historycount; i++) {
-                  var c = historycount - i - 1;
-                  var timestamp = new Date($scope.stats[i].Date * 1000);
-                  switch (attr) {
-                         case "timestamp":
-                              //var formatted = timestamp.toString();
-                              var date = timestamp;
-                              var year = date.getFullYear();
-                              var month = date.getMonth() + 1;
-                              var day = date.getDate();
-                              var hours = date.getHours();
-                              var minutes = date.getMinutes();
-                              var seconds = date.getSeconds();
-                              var formatted = year + "-" + month + "-" + day + "-" + hours + "-" + minutes+ "-" + seconds;
-                              //var formatted = "2015-05-20-05-10-13";
-                              //console.log(formatted);
+            //console.log("UNDEFINEDCHECKERXXMLG: Checked: "+$scope.stats);
+            if ($scope.stats != undefined) {
+                //console.log("PROCEEDING: Checked: "+$scope.stats);
+                for (var i = 0; i < historycount; i++) {
+                      var c = historycount - i - 1;
 
-                              tempArray.push(formatted);
-                              break;
-                        case "traffic":
-                              tempArray.push([timestamp, parseFloat($scope.stats[i].Rxdiff / 1024 / 1024), parseFloat($scope.stats[i].Txdiff / 1024 / 1024)]);
-                              break;
-                        case "median":
-                              tempArray.push(1);
-                              break;
-                        case "RX":
-                              tempArray.push(parseFloat(Math.round($scope.stats[i].Rxdiff / 1024) / 1024));
-                              break;
-                        case "TX":
-                              tempArray.push(parseFloat(Math.round($scope.stats[i].Txdiff / 1024) / 1024));
-                              break;
-                        case "CPU":
-                              tempArray.push(parseFloat($scope.stats[i].Loadcpu));
-                              break;
-                        case "loadio":
-                              tempArray.push([timestamp, parseFloat($scope.stats[i].Loadio)]);
-                              break;
-                        case "loadShort":
-                              loadNumber = $scope.stats[i].Load.split(' ');
-                              tempArray.push(parseFloat(loadNumber[0]));
-                              break;
-                        case "loadMid":
-                              loadNumber = $scope.stats[i].Load.split(' ');
-                              tempArray.push(parseFloat(loadNumber[1]));
-                              break;
-                        case "loadLong":
-                              loadNumber = $scope.stats[i].Load.split(' ');
-                              tempArray.push(parseFloat(loadNumber[2]));
-                              break;
-                        case "Memory Total":
-                              tempArray.push(parseFloat($scope.stats[i].Ramtotal / 1024 / 1024));
-                              break;
-                        case "Memory Usage":
-                              tempArray.push(parseFloat($scope.stats[i].Ramusage / 1024 / 1024));
-                              break;
-                        case "Disk Usage":
-                              tempArray.push(Math.round(parseFloat($scope.stats[i].Diskusage / 1024 / 1024 / 1024)*10)/10);
-                              break;
-                        case "Disk Total":
-                              tempArray.push(Math.round(parseFloat($scope.stats[i].Disktotal / 1024 / 1024 / 1024)*10)/10);
-                              break;
-                        case "ping":
-                              tempArray.push(parseFloat(Math.round($scope.stats[i].Ping)));
-                              break;
-                        case "IO":
-                              //DEBUG-console.log("IO", parseFloat($scope.stats[i].Loadio));
-                              var FiftyFifty = Math.round(Math.random());
-                              //tempArray.push(parseFloat($scope.stats[i].Loadio+FiftyFifty));
-                              tempArray.push(parseFloat($scope.stats[i].Loadio));
-                              break;
-                        default:
-                              tempArray.push([c, $scope.stats[i][attr]]);
-                  }
+                      var timestamp = new Date($scope.stats[i].Date * 1000);
+                      switch (attr) {
+                             case "timestamp":
+                                  //var formatted = timestamp.toString();
+                                  var date = timestamp;
+                                  var year = date.getFullYear();
+                                  var month = date.getMonth() + 1;
+                                  var day = date.getDate();
+                                  var hours = date.getHours();
+                                  var minutes = date.getMinutes();
+                                  var seconds = date.getSeconds();
+                                  var formatted = year + "-" + month + "-" + day + "-" + hours + "-" + minutes+ "-" + seconds;
+                                  //var formatted = "2015-05-20-05-10-13";
+                                  //console.log(formatted);
+
+                                  tempArray.push(formatted);
+                                  break;
+                            case "traffic":
+                                  tempArray.push([timestamp, parseFloat($scope.stats[i].Rxdiff / 1024 / 1024), parseFloat($scope.stats[i].Txdiff / 1024 / 1024)]);
+                                  break;
+                            case "median":
+                                  tempArray.push(1);
+                                  break;
+                            case "RX":
+                                  tempArray.push(parseFloat(Math.round($scope.stats[i].Rxdiff / 1024) / 1024));
+                                  break;
+                            case "TX":
+                                  tempArray.push(parseFloat(Math.round($scope.stats[i].Txdiff / 1024) / 1024));
+                                  break;
+                            case "CPU":
+                                  tempArray.push(parseFloat($scope.stats[i].Loadcpu));
+                                  break;
+                            case "loadio":
+                                  tempArray.push([timestamp, parseFloat($scope.stats[i].Loadio)]);
+                                  break;
+                            case "loadShort":
+                                  loadNumber = $scope.stats[i].Load.split(' ');
+                                  tempArray.push(parseFloat(loadNumber[0]));
+                                  break;
+                            case "loadMid":
+                                  loadNumber = $scope.stats[i].Load.split(' ');
+                                  tempArray.push(parseFloat(loadNumber[1]));
+                                  break;
+                            case "loadLong":
+                                  loadNumber = $scope.stats[i].Load.split(' ');
+                                  tempArray.push(parseFloat(loadNumber[2]));
+                                  break;
+                            case "Memory Total":
+                                  tempArray.push(parseFloat($scope.stats[i].Ramtotal / 1024 / 1024));
+                                  break;
+                            case "Memory Usage":
+                                  tempArray.push(parseFloat($scope.stats[i].Ramusage / 1024 / 1024));
+                                  break;
+                            case "Disk Usage":
+                                  tempArray.push(Math.round(parseFloat($scope.stats[i].Diskusage / 1024 / 1024 / 1024)*10)/10);
+                                  break;
+                            case "Disk Total":
+                                  tempArray.push(Math.round(parseFloat($scope.stats[i].Disktotal / 1024 / 1024 / 1024)*10)/10);
+                                  break;
+                            case "ping":
+                                  tempArray.push(parseFloat(Math.round($scope.stats[i].Ping)));
+                                  break;
+                            case "IO":
+                                  //DEBUG-console.log("IO", parseFloat($scope.stats[i].Loadio));
+                                  var FiftyFifty = Math.round(Math.random());
+                                  //tempArray.push(parseFloat($scope.stats[i].Loadio+FiftyFifty));
+                                  tempArray.push(parseFloat($scope.stats[i].Loadio));
+                                  break;
+                            default:
+                                  tempArray.push([c, $scope.stats[i][attr]]);
+                      }
+                }
+
             }
             //DEBUG-console.log("ATTR: " + attr);
             //DEBUG-console.log(tempArray);
