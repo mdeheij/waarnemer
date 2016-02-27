@@ -1,0 +1,12 @@
+#!/bin/bash
+
+while getopts ":u:H:t:e:" opt; do
+  case $opt in
+    u)     user=$OPTARG             ;;
+    H)     host=$OPTARG             ;;
+    t)     timeout=$OPTARG          ;;
+    e)     execute=$OPTARG          ;;
+  esac
+done
+
+ssh "$user@$host" "$execute"
