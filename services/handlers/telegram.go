@@ -5,15 +5,17 @@ import (
 	"github.com/bartholdbos/golegram"
 )
 
-type Instance struct {
+type instanceHolder struct {
 	bot *golegram.Bot
 }
 
-var instance Instance
+var instance instanceHolder
 
+//Telegram sends a Telegram message to one or more users by their unique ID
 func Telegram(targets []int32, message string) {
 	var err error
-	fmt.Println("Sending to following targets: ", targets)
+
+	fmt.Println("[Telegram] Sending to following target(s): ", targets)
 
 	if instance.bot == nil {
 		//TODO: get config from file
@@ -23,10 +25,9 @@ func Telegram(targets []int32, message string) {
 		for _, target := range targets {
 			result, err := instance.bot.SendMessage(target, message)
 			if err != nil {
+				fmt.Println("[Telegram] Message error")
 				fmt.Println(err)
 				fmt.Println(result)
-			} else {
-				fmt.Println("Geen error bij zenden van Telegram")
 			}
 		}
 	}

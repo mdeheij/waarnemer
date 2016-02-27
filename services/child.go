@@ -3,7 +3,7 @@ package services
 //import "os"
 import (
 	"bytes"
-	"fmt"
+	"github.com/mdeheij/monitoring/configuration"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -15,11 +15,13 @@ func CheckService(command string) (status int, output string, rtime int64) {
 	now := time.Now()
 	timeStampHuman := now.Format(time.Stamp)
 	//status, outputMsg := execute(executable, args)
-	path := "services/checks/"
+	path := "checks/"
 	testArgs := make([]string, 1)
-	testArgs[0] = ServicesConfig.BaseFolder + path + command
+	testArgs[0] = configuration.Config.BaseFolder + path + command
 
-	status, outputMsg := execute(ServicesConfig.BaseFolder+path+"wrapper", testArgs)
+	wrapperLocation := configuration.Config.BaseFolder + path + "wrapper"
+	DebugMessage("WrapperLocation: " + wrapperLocation)
+	status, outputMsg := execute(wrapperLocation, testArgs)
 
 	elapsedTime := time.Since(now)
 	elapsedTimeHuman := elapsedTime.Nanoseconds() / 1000000
@@ -31,7 +33,7 @@ func CheckService(command string) (status int, output string, rtime int64) {
 		symbol = StatusColor("●", 0)
 	}
 
-	fmt.Println(symbol + " [" + timeStampHuman + "] {" + elapsedTime.String() + "} (" + strconv.Itoa(status) + ") - " + command + " -" + outputMsg)
+	DebugMessage(symbol + " [" + timeStampHuman + "] {" + elapsedTime.String() + "} (" + strconv.Itoa(status) + ") - " + command + " -" + outputMsg)
 	return status, outputMsg, elapsedTimeHuman
 }
 

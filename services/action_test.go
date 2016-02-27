@@ -3,7 +3,6 @@ package services
 import (
 	"flag"
 	"fmt"
-	"os"
 	"testing"
 )
 
@@ -14,13 +13,13 @@ func init() {
 	flag.Parse()
 }
 
-func Test(t *testing.T) {
+func NoTestAction(t *testing.T) {
 	//fmt.Println(ServicesConfig)
-	fmt.Println("[Testing]")
+	//fmt.Println("[Testing]")
 
 	if target == 0 {
 		fmt.Println("Telgeram Target ID is required. Use --target CHAT_ID")
-		os.Exit(2)
+		t.Fail()
 	}
 	//tgtg := []int32{4009810, -62946040}
 	cijfer := int32(target)

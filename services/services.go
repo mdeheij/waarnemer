@@ -12,9 +12,10 @@ import (
 
 var garbage string
 
-var Services = make(map[string]Service)
+var Services = NewCMap()
 
 var DaemonActive = false
+var DebugMode = false
 var SilenceAll = false
 
 type ServicesConfiguration struct {
@@ -45,29 +46,40 @@ type Service struct {
 func (service Service) Enable() {
 	//enable
 	service.Enabled = true
-	Services[service.Identifier] = service
+	Services.Set(service.Identifier, service)
 	//commit naar db
 }
 
 func (service Service) Disable() {
 	//enable
 	service.Enabled = false
-	Services[service.Identifier] = service
+	Services.Set(service.Identifier, service)
 	//commit naar db
 }
 
 func (service Service) Reschedule() {
 	service.LastCheck, _ = time.Parse(time.UnixDate, "Sat Mar  7 11:06:39.1234 PST 1990")
-	Services[service.Identifier] = service
+	Services.Set(service.Identifier, service)
+}
+
+func EnableDebug() {
+	DebugMode = true
+}
+
+func DebugMessage(text string) {
+	if DebugMode == true {
+		fmt.Println(text)
+	}
 }
 
 func UpdateList() {
 	//Do not start a new check while updating
 	jsonServices := getServices() //dit is geen map
-	jsonServicesMap := make(map[string]Service)
+	jsonServicesMap := NewCMap()
 
 	for _, newService := range jsonServices {
-		oldService := Services[newService.Identifier]
+		//oldService := Services[newService.Identifier]
+		oldService, _ := Services.Get(newService.Identifier)
 
 		newService.Lock = oldService.Lock
 		newService.LastCheck = oldService.LastCheck
@@ -76,8 +88,8 @@ func UpdateList() {
 		newService.Output = oldService.Output
 		newService.RTime = oldService.RTime
 
-		jsonServicesMap[newService.Identifier] = newService
-		fmt.Println("Reloaded " + oldService.Identifier + " as " + newService.Identifier)
+		jsonServicesMap.Set(newService.Identifier, newService)
+		DebugMessage("Reloaded " + oldService.Identifier + " as " + newService.Identifier)
 	}
 
 	Services = jsonServicesMap
@@ -97,7 +109,7 @@ func (service Service) Update() string {
 			newService.RTime = service.RTime
 
 			//push new service to Services map
-			Services[service.Identifier] = newService
+			Services.Set(service.Identifier, newService)
 
 			return "(!!) Reloaded " + service.Identifier + " from " + newService.Identifier
 		}
@@ -109,7 +121,7 @@ func (service Service) Update() string {
 func (service Service) getJSON() string {
 	b, err := json.Marshal(service)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 	return string(b)
 }
@@ -128,13 +140,13 @@ func StatusColor(text string, health int) string {
 	}
 }
 
-func (service Service) spawnChild() {
+func (service Service) spawnChild() int {
 
 	args := service.Command
 	args = strings.Replace(args, "$HOST$", service.Host, -1)
 	args = strings.Replace(args, "$TIMEOUT$", strconv.Itoa(service.Timeout), -1)
 
-	//fmt.Println("::::SpawnChild::Checking for " + service.Identifier + " - " + args)
+	//DebugMessage("::::SpawnChild::Checking for " + service.Identifier + " - " + args)
 	status, output, rtime := CheckService(args)
 	service.Output = output
 
@@ -169,7 +181,9 @@ func (service Service) spawnChild() {
 	service.Lock = false
 	service.RTime = rtime
 	service.LastCheck = time.Now()
-	Services[service.Identifier] = service
+	Services.Set(service.Identifier, service)
+
+	return status
 }
 
 func checkError(e error) {
@@ -182,11 +196,14 @@ func checkDispatcher() {
 
 	for {
 		if DaemonActive == true {
-			for key, service := range Services {
+			for item := range Services.Iter() {
+				service := item.Val
+				key := item.Key
+
 				diff := int(time.Now().Unix()) - int(service.LastCheck.Unix())
 				//editableService := service
 				//fmt.Print("ID:", key, "  ")
-				//	fmt.Println(diff)
+				//	DebugMessage(diff)
 
 				if service.Enabled {
 					if diff > service.Interval && service.Lock == false {
@@ -194,25 +211,26 @@ func checkDispatcher() {
 						service.Lock = true
 
 						//update status in map
-						Services[key] = service
+						//Services[key] = service
+						Services.Set(key, service)
 
 						//spawn check for service
 						go service.spawnChild()
 
 					} else {
 						//fmt.Print(service.Identifier + " will check in: ")
-						//fmt.Println(nextCheck)
+						//DebugMessage(nextCheck)
 					}
 				}
 			}
 		} else {
-			//fmt.Println("Not checking because DaemonActive is not true")
+			//DebugMessage("Not checking because DaemonActive is not true")
 		}
 
 		for i := 0; i < 1; i++ {
-			//	fmt.Println("● ")
+			//	DebugMessage("● ")
 			time.Sleep(1 * time.Second)
-			//fmt.Println("Next run in " + strconv.Itoa(3-i) + "..")
+			//DebugMessage("Next run in " + strconv.Itoa(3-i) + "..")
 		}
 
 	}
@@ -224,34 +242,34 @@ func Init() {
 	go checkDispatcher()
 }
 func Start() {
-	fmt.Println("Starting..")
+	DebugMessage("Starting..")
 	DaemonActive = true
-	a := NewAction(Service{Host: configuration.Config.Hostname, Identifier: "monitoring.daemon", Threshold: 3, Health: 1, Output: "Monitoring started!", Action: ActionConfig{Name: "telegram", Telegramtarget: []int32{configuration.Config.TelegramNotificationTarget}}})
-	a.Run()
+
+	if DebugMode == true {
+		a := NewAction(Service{Host: configuration.Config.Hostname, Identifier: "monitoring.daemon", Threshold: 3, Health: 1, Output: "Monitoring started!", Action: ActionConfig{Name: "telegram", Telegramtarget: []int32{configuration.Config.TelegramNotificationTarget}}})
+		a.Run()
+	}
 }
 func Stop() {
-	fmt.Println("Stopping..")
+	DebugMessage("Stopping..")
 	DaemonActive = false
 	a := NewAction(Service{})
 	a.Run()
 }
 
 func reloadServices() {
-	fmt.Println("Reading JSON")
+	DebugMessage("Reading JSON")
 	var count int
-	fmt.Println("━━━━━━━━━━[Loading services]━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
-	fmt.Println("TG BOT TOKEN: (" + configuration.Config.TelegramBotToken + ")")
+	DebugMessage("━━━━━━━━━━[Loading services]━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
+	DebugMessage("TG BOT TOKEN: (" + configuration.Config.TelegramBotToken + ")")
 	for _, service := range getServices() {
 		service.Health = -1 //you know nothing, monitoring
-		Services[service.Identifier] = service
-		fmt.Println("Loaded " + service.Identifier)
+		Services.Set(service.Identifier, service)
+		DebugMessage("Loaded " + service.Identifier)
 		count++
 	}
-	fmt.Println("-----")
-	fmt.Print("Total: ")
-	fmt.Println(count)
 
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
+	DebugMessage("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
 
 }
 
@@ -260,9 +278,9 @@ func getServices() []Service {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println("DEBUG REALLY VERBOSE")
-		fmt.Println()
-		fmt.Println(string(raw))
+		DebugMessage("DEBUG REALLY VERBOSE")
+		DebugMessage("")
+		DebugMessage(string(raw))
 	}
 
 	var s []Service

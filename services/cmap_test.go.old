@@ -1,0 +1,67 @@
+package services
+
+import (
+	//"flag"
+	"fmt"
+	//"os"
+	"testing"
+	"time"
+)
+
+//
+// func init() {
+// 	flag.IntVar(&target, "target", 0, "The telegram target")
+// 	flag.Parse()
+// }
+var cmap ConcurrentMap
+var normalmap = make(map[string]Service)
+
+func ConcurrentMapTester(nummer int) {
+	// Retrieve item from map.
+	fmt.Println("\t", nummer, "Testing Go ConcurrentMapTester")
+	if tmp, ok := cmap.Get("foo"); ok {
+		bar := tmp
+		fmt.Println("retrieving bar:", bar)
+	}
+
+	time.Sleep(100)
+	// Removes item under key "foo"
+	//cmap.Remove("foo")
+	cmap.Set("foo", Service{Host: "CONCURRENT!"})
+	henk, ingrid := cmap.Get("foo")
+	_ = ingrid
+	fmt.Println("retrieving new one: ", henk)
+}
+
+//Confirmed: normal maps don't support concurrent writes
+func NotSoConcurrentMapTester(nummer int) {
+	// Retrieve item from map.
+	fmt.Println("\t", nummer, "Testing Go NotSoConcurrentMapTester")
+	fmt.Println(normalmap["foo"])
+
+	// Removes item under key "foo"
+	//cmap.Remove("foo")
+	time.Sleep(100)
+
+	normalmap["foo"] = Service{Timeout: nummer}
+	fmt.Println("retrieving new one: ", normalmap["foo"])
+}
+
+func TestService(t *testing.T) {
+	//fmt.Println(ServicesConfig)
+	//reloadServices()
+
+	// Create a new map.
+	cmap = NewCMap()
+
+	for i := 0; i < 10000; i++ {
+		go ConcurrentMapTester(i)
+		//go NotSoConcurrentMapTester(i)
+	}
+
+	// Sets item within map, sets "bar" under key "foo"
+	cmap.Set("foo", Service{Host: "test.host.nl"})
+
+	time.Sleep(10 * time.Second)
+
+}
