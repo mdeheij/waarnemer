@@ -1,11 +1,12 @@
 {
     "TelegramNotificationTarget": 0,
     "TelegramBotToken": "",
-    "BaseFolder": "/opt/monitoring/",
+    "BaseFolder": "/etc/monitoring/",
+    "ResourceFolder": "/usr/share/monitoring/",
     "ServerAddress": "0.0.0.0",
     "ServerPort": 4200,
-    "SecureCookieName": "pancakes",
-    "SecureCookie": "",
+    "SecureCookieName": "MonitoringSession",
+    "SecureCookie": "ReplaceMeWithSomethingMoreSecure",
     "AllowedUsers": [
         "admin",
         "root"
@@ -18,10 +19,10 @@
         "HttpOnly": true
     },
     "DatabaseConfig": {
-        "Username": "",
+        "Username": "monitoring",
         "Password": "",
-        "Database": "",
-        "Host": "",
+        "Database": "monitoring",
+        "Host": "localhost",
         "Port": "3306",
         "Engine": "InnoDB",
         "Encoding": "UTF-8"
