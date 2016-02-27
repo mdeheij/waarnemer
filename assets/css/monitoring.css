@@ -47,5 +47,11 @@ stroke-width: 3px;
 	-webkit-filter: invert(100%);
     filter: invert(100%);
 }
+input[type="text"] {
+  padding: 0px;
+  width:90%;
+  border: solid 0px;
+  background-color: rgba(0, 0, 0, 0);
+}
 /* #gauges td  { transition: all .2s ease-in-out; }
 #gauges td:hover  { transform: scale(1.1); background-color: #eee; } */

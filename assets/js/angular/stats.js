@@ -47,7 +47,7 @@ app.controller('MainCtrl', function($scope, $http, $location) {
             $scope.abstractGraph('#ram', [getStatistics($scope, "timestamp"), getStatistics($scope, "Memory Total"), getStatistics($scope, "Memory Usage")], 'area-spline');
             $scope.abstractGraph('#ping', [getStatistics($scope, "timestamp"), getStatistics($scope, "ping")], 'spline');
 
-            
+
 
             $scope.abstractGraph('#processPieCPU', $scope.processToPie(true), 'donut');
             $scope.abstractGraph('#processPieRSS', $scope.processToPie(false), 'donut');
@@ -319,6 +319,48 @@ function henkfietspop() {
       //h1.setViewBox(0,0,$('#chart1').parent().width(),200,false);
       //DEBUG-console.log($('#chart1').parent().width(), 200);
 }
+
+
+//One click to copy
+$("input[type='text']").on("click", function () {
+   $(this).select();
+});
+
+
+(function($) {
+    var copyToClipboard = function (text) {
+        if (!document.queryCommandSupported('copy')) {
+            window.prompt("", text);
+            return;
+        }
+
+        var $textarea = $('<textarea></textarea>')
+            .val(text)
+            .appendTo(document.body)
+            .select();
+
+        document.execCommand('copy');
+
+        $textarea.remove();
+
+        UIkit.notify(
+            "<i class='uk-icon-check'></i>'" + text + "' is gekopieerd naar klembord.",
+            { pos : 'bottom-right', status : 'success' }
+        );
+    };
+
+    $('#uk-switch-list *[data-copy-to-clipboard]').click(function(e) {
+        copyToClipboard('' + $(this).data('copy-to-clipboard'));
+
+        $(this)
+            .removeClass('copied')
+            .addClass('copied');
+
+        e.preventDefault();
+        return false;
+    });
+})(jQuery);
+
 
 
 /*
