@@ -8,9 +8,13 @@ import (
 	"strings"
 )
 
-func servicesInit(r *gin.Engine) {
+func servicesInit(r *gin.Engine, debug bool) {
+	if debug == true {
+		services.EnableDebug()
+	}
 	services.Start()
 	services.Init()
+
 	monitoringGroup := r.Group("/services", AuthRequired())
 	{
 		monitoringGroup.GET("/", servicesPage)
@@ -59,7 +63,8 @@ func servicesRescheduleCheck(c *gin.Context) {
 	var result string
 
 	if identifier != "" {
-		services.Services[identifier].Reschedule()
+		service, _ := services.Services.Get(identifier)
+		service.Reschedule()
 		result = "Command sent"
 	} else {
 		result = "No parameter to update!"
@@ -75,9 +80,11 @@ func servicesUpdate(c *gin.Context) {
 	var lastCheckOld string
 	var lastCheckNew string
 	if identifier != "" {
-		lastCheckOld = services.Services[identifier].LastCheck.String()
-		result = services.Services[identifier].Update()
-		lastCheckNew = services.Services[identifier].LastCheck.String()
+		service, _ := services.Services.Get(identifier)
+		lastCheckOld = service.LastCheck.String()
+		//lastCheckOld = services.Services[identifier].LastCheck.String()
+		result = service.Update()
+		lastCheckNew = service.LastCheck.String()
 	} else {
 		result = "No parameter to update!"
 	}
@@ -99,6 +106,8 @@ func servicesGetServicesAsJSON(c *gin.Context) {
 	result, _ := json.Marshal(services.Services)
 	c.String(200, string(result))
 }
+
+//servicesGetServicesWithIdentifier returns the services which match the given identifier as a json
 func servicesGetServicesWithIdentifier(c *gin.Context) {
 
 	identifier := c.Param("identifier")
@@ -106,15 +115,17 @@ func servicesGetServicesWithIdentifier(c *gin.Context) {
 	if identifier != "" {
 		var s []services.Service
 
-		for _, item := range services.Services {
+		for item := range services.Services.Iter() {
 
-			item.Host = strings.Replace(item.Host, "http://", "", -1)
-			item.Host = strings.Replace(item.Host, "https://", "", -1)
-			tempHost := strings.Split(item.Host, "/")
-			item.Host = tempHost[0]
+			service := item.Val
 
-			if strings.HasPrefix(item.Identifier, identifier) {
-				s = append(s, item)
+			service.Host = strings.Replace(service.Host, "http://", "", -1)
+			service.Host = strings.Replace(service.Host, "https://", "", -1)
+			tempHost := strings.Split(service.Host, "/")
+			service.Host = tempHost[0]
+
+			if strings.HasPrefix(service.Identifier, identifier) {
+				s = append(s, service)
 			}
 		}
 		result, _ := json.Marshal(s)
