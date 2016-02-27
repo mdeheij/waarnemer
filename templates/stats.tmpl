@@ -45,40 +45,49 @@
                     <dl class="uk-description-list-horizontal">
 
                         <dt>Identifier</dt>
-                        <dd>{{"{{"}} selectedHostIdentifier {{"}}"}}&nbsp;</dd>
+                        <dd><input type="text" ng-model="selectedHostIdentifier" onclick="select()" readonly/>&nbsp;</dd>
 
-                        <dt>Freq</dt>
-                        <dd>{{"{{"}} stats[0].Frequency {{"}}"}}s&nbsp;</dd>
+                        <dt>Freq (s)</dt>
+                        <dd><input type="text" ng-model="stats[0].Frequency" onclick="select()" readonly/>&nbsp;</dd>
 
                         <dt>Connections</dt>
-                        <dd>{{"{{"}} stats[0].Connections {{"}}"}}&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Connections" onclick="select()" readonly/>&nbsp;</dd>
 
                         <dt>Hostname</dt>
-                        <dd>{{"{{"}} stats[0].Hostname {{"}}"}}&nbsp;&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Hostname" onclick="select()" readonly/>&nbsp;&nbsp;</dd>
+
+                        <dt>Uptime (days)</dt>
+                        <dd><input type="text" ng-model="stats[0].Uptime / 60 / 60 / 24 | number:1" onclick="select()" readonly/>&nbsp;&nbsp;</dd>
 
                         <dt>Latency</dt>
-                        <dd>{{"{{"}} stats[0].Ping {{"}}"}}&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Ping" onclick="select()" readonly/>&nbsp;</dd>
 
-                        <dt>NIC {{"{{"}} stats[0].SSID {{"}}"}}</dt>
-                        <dd>{{"{{"}} stats[0].Nic {{"}}"}}&nbsp;</dd>
+                        <dt>NIC <input type="text" ng-model="stats[0].SSID" onclick="select()" readonly/></dt>
+                        <dd><input type="text" ng-model="stats[0].Nic" onclick="select()" readonly/>&nbsp;</dd>
 
-                        <dt>RX/TX</dt>
-                        <dd>{{"{{"}} stats[0].Rx /1024/1024 | number:2 {{"}}"}} / {{"{{"}} stats[0].Tx /1024/1024 | number:2 {{"}}"}}&nbsp;</dd>
+                        <dt>RX (MB)</dt>
+                        <dd><input type="text" ng-model="stats[0].Rx /1024/1024 | number:2" onclick="select()" readonly/>&nbsp;</dd>
 
-                        <dt>RX/TX Differences</dt>
-                        <dd>{{"{{"}} stats[0].Rxdiff {{"}}"}}/{{"{{"}} stats[0].Txdiff {{"}}"}}&nbsp;</dd>
+                        <dt>TX (MB)</dt>
+                        <dd><input type="text" ng-model="stats[0].Tx /1024/1024 | number:2" onclick="select()" readonly/>&nbsp;</dd>
 
-                        <dt>IPv4 ({{"{{"}} stats[0].Nic {{"}}"}})</dt>
-                        <dd>{{"{{"}} stats[0].Ipv4 {{"}}"}}&nbsp;</dd>
+                        <dt>RX Differences</dt>
+                        <dd><input type="text" ng-model="stats[0].Rxdiff" onclick="select()" readonly/>&nbsp;</dd>
+
+                        <dt>TX Differences</dt>
+                        <dd><input type="text" ng-model="stats[0].Txdiff" onclick="select()" readonly/>&nbsp;</dd>
+
+                        <dt>IPv4 ({{"{{"}}stats[0].Nic{{"}}"}})</dt>
+                        <dd><input type="text" ng-model="stats[0].Ipv4" onclick="select()" readonly/>&nbsp;</dd>
 
                         <dt>IPv4 (public)</dt>
-                        <dd>{{"{{"}} stats[0].Ipv4Public {{"}}"}}&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Ipv4Public" onclick="select()" readonly/>&nbsp;</dd>
 
                         <dt>IPv6</dt>
-                        <dd>{{"{{"}} stats[0].Ipv6 {{"}}"}}&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Ipv6" onclick="select()" readonly/>&nbsp;</dd>
 
                         <dt>Operating System</dt>
-                        <dd>{{"{{"}} stats[0].Osname {{"}}"}} <small>{{"{{"}} stats[0].Osarch {{"}}"}}</small>&nbsp;</dd>
+                        <dd><input type="text" ng-model="stats[0].Osname + ' ' + stats[0].Osarch" onclick="select()" readonly/>&nbsp;</dd>
 
                     </dl>
                     <div></div>

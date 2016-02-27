@@ -43,7 +43,7 @@
                             <td>{{ .angular }} x.interval  }}</td>
                             <td>{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
                             <td>{{ .angular }} mySplit(x.command,0) }}</td>
-                            <td><i ng-show="x.action == 'telegram'" class="fa fa-paper-plane"></i></td>
+                            <td><i ng-show="x.Action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
                             <td><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
                             <td><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
                         </tr>
