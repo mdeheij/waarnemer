@@ -9,8 +9,8 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/opt/monitoring/"
-cmd="/opt/monitoring/monitoring"
+dir="/etc/monitoring/"
+cmd="/usr/bin/monitoring"
 user=""
 
 name=`basename $0`
