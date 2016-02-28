@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/mdeheij/gotools"
+	//"github.com/mdeheij/gotools"
 	"github.com/mdeheij/monitoring/configuration"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
@@ -22,11 +22,14 @@ func getLoginUsername(c *gin.Context) string {
 //Authenticate User
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !gotools.StringInSlice(getLoginUsername(c), configuration.Config.AllowedUsers) {
+		username := getLoginUsername(c)
+
+		if len(getUserByUsername(username).Username) > 0 { //TODO fix this
+			//c.Next()
+			c.Next()
+		} else {
 			c.Redirect(302, "/login?pleaseloginfirst")
 			c.Abort()
-		} else {
-			c.Next()
 		}
 	}
 }
@@ -84,13 +87,23 @@ func GenerateFromPassword(password string) string {
 	}
 	return string(hashedPassword)
 }
-func CheckPassword(username string, password string) bool {
-	// Hashing the password with the default cost of 10
 
-	hashedPassword, err := dbmap.SelectStr("SELECT password FROM user WHERE username = ?", username)
-	if err != nil {
-		fmt.Println(err)
+func getUserByUsername(username string) configuration.User {
+	for _, v := range configuration.Config.Users {
+		if v.Username == username {
+			return v
+		}
 	}
+	return configuration.User{}
+}
+func CheckPassword(username string, password string) bool {
+
+	hashedPassword := getUserByUsername(username).Hash
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	//TODO implement error handling
+
 	errCompare := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if errCompare == nil {
 		return true
