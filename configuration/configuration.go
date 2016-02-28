@@ -15,7 +15,7 @@ type Configuration struct {
 	ResourceFolder   string
 	ServerAddress    string
 	ServerPort       int
-	AllowedUsers     []string
+	Users            []User
 	SecureCookieName string
 	SecureCookie     string
 	// ChecksFolder               string
@@ -26,6 +26,12 @@ type Configuration struct {
 	DatabaseConfig             MySQLConfig
 	CookieConfig               sessions.Options
 }
+
+type User struct {
+	Username string
+	Hash     string
+}
+
 type MySQLConfig struct {
 	Username string
 	Password string
