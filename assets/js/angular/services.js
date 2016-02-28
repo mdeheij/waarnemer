@@ -83,7 +83,7 @@ app.controller('customersCtrl', function($scope, $http) {
             });
       };
       $scope.resetPolling = function() {
-            UIkit.notify("<i class='uk-icon-check'></i> Polling time is set to " + $scope.pollingInterval);
+            //UIkit.notify("<i class='uk-icon-check'></i> Polling time is set to " + $scope.pollingInterval);
             //DEBUG-console.log("resetPolling -- consolelog - " + $scope.pollingInterval);
             $scope.timerActive = true;
             clearInterval(Timer);
@@ -98,7 +98,7 @@ app.controller('customersCtrl', function($scope, $http) {
                   $('#refreshToolbarIcon').removeClass("fa-spin uk-text-warning");
             });
       };
-      $scope.pollingInterval = 2500;
+      $scope.pollingInterval = 1000;
       $scope.resetPolling();
       //var Timer=setInterval(refreshTable,$scope.pollingInterval);
       //DEBUG-console.log($scope.pollingInterval);
