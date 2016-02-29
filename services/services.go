@@ -109,6 +109,7 @@ func (service Service) Update() string {
 			newService.RTime = service.RTime
 
 			//push new service to Services map
+			fmt.Println("Setting service :112 -> ", service.Identifier, newService)
 			Services.Set(service.Identifier, newService)
 
 			return "(!!) Reloaded " + service.Identifier + " from " + newService.Identifier
@@ -196,7 +197,7 @@ func checkDispatcher() {
 
 	for {
 		if DaemonActive == true {
-			for item := range Services.Iter() {
+			for item := range Services.IterBuffered() {
 				service := item.Val
 				key := item.Key
 
@@ -278,7 +279,7 @@ func getServices() []Service {
 	if err != nil {
 		panic(err)
 	} else {
-		DebugMessage("DEBUG REALLY VERBOSE")
+		DebugMessage("DEBUG REALLY VERBOSE func getServices() []Service")
 		DebugMessage("")
 		DebugMessage(string(raw))
 	}
