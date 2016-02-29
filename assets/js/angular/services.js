@@ -45,6 +45,13 @@ app.controller('customersCtrl', function($scope, $http) {
                   alert("Error.");
             });
       };
+      $scope.openDetails = function(x) {
+          console.log("Info over X:");
+          console.log(x);
+
+            UIkit.modal("#service-info").show();
+            $scope.selectedService = x;
+      };
       $scope.rescheduleCheck = function(identifier) {
 
             //DEBUG-console.log("Rescheduling!");
