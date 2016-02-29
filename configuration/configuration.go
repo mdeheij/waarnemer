@@ -23,23 +23,12 @@ type Configuration struct {
 	// ConfigFile                 string
 	TelegramBotToken           string `json:"TelegramBotToken"`
 	TelegramNotificationTarget int32  `json:"TelegramNotificationTarget"`
-	DatabaseConfig             MySQLConfig
 	CookieConfig               sessions.Options
 }
 
 type User struct {
 	Username string
 	Hash     string
-}
-
-type MySQLConfig struct {
-	Username string
-	Password string
-	Database string
-	Host     string
-	Port     string
-	Engine   string
-	Encoding string
 }
 
 func Init(configfile string) {
