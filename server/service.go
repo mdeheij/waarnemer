@@ -8,11 +8,14 @@ import (
 	"strings"
 )
 
-func servicesInit(r *gin.Engine, debug bool) {
+func servicesInit(r *gin.Engine, debug bool, autostart bool) {
 	if debug == true {
 		services.EnableDebug()
 	}
-	services.Start()
+	if autostart == true {
+		services.Start()
+	}
+
 	services.Init()
 
 	monitoringGroup := r.Group("/services", AuthRequired())
@@ -25,6 +28,10 @@ func servicesInit(r *gin.Engine, debug bool) {
 		monitoringGroup.GET("/reschedule/:identifier", servicesRescheduleCheck)
 		monitoringGroup.GET("/list.json", servicesGetServicesAsJSON)
 		monitoringGroup.GET("/list/:identifier", servicesGetServicesWithIdentifier)
+	}
+	embedGroup := r.Group("/embed")
+	{
+		embedGroup.GET("/", servicesGetServicesEmbed)
 	}
 }
 
@@ -135,4 +142,35 @@ func servicesGetServicesWithIdentifier(c *gin.Context) {
 		}
 	}
 	c.JSON(200, gin.H{})
+}
+
+func getProblematicServices() []services.Service {
+	var s []services.Service
+
+	for item := range services.Services.IterBuffered() {
+
+		service := item.Val
+
+		if service.Health > 0 {
+			s = append(s, service)
+		}
+	}
+
+	return s
+
+}
+
+//servicesGetServicesEmbed returns the services as a nice embed for Grafana
+func servicesGetServicesEmbed(c *gin.Context) {
+
+	//hostname := c.Param("hostname")
+
+	c.HTML(200, "embed.html", gin.H{
+		"title":    "Monitoring",
+		"services": getProblematicServices(),
+		"subtitle": "Running: " + strconv.FormatBool(services.DaemonActive),
+		"angular":  "{{",
+	})
+	//TODO: think how I'm going to build this
+	//	c.JSON(200, gin.H{})
 }

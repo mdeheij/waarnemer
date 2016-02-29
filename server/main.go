@@ -37,7 +37,7 @@ func base64Decode(str string) string {
 // 	return result
 // }
 
-func Setup(debug bool) {
+func Setup(debug bool, autostart bool) {
 
 	if debug == true {
 		DebugMode = true
@@ -55,7 +55,7 @@ func Setup(debug bool) {
 	})
 
 	loginInit(r)
-	servicesInit(r, debug)
+	servicesInit(r, debug, autostart)
 
 	bindTarget := configuration.Config.ServerAddress + ":" + strconv.Itoa(configuration.Config.ServerPort)
 	//fmt.Println("http://" + bindTarget)
