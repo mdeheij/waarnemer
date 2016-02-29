@@ -1,0 +1,26 @@
+<script src="https://pool.gate.sh/web-assets/jquery/1.7.1/jquery.min.js"></script>
+
+<script>
+$(function() {
+    startRefresh();
+});
+
+function startRefresh() {
+    setTimeout(startRefresh,5000);
+    $.get('/embed/', function(data) {
+        $('html').html(data);
+    });
+}
+</script>
+<div class="table-panel-container ng-scope">
+				<table class="table-panel-table" style="font-size: 14px; font-family: 'Arial', sans-serif; color: #fff;">
+				    <tbody>
+
+                        {{ range $index, $download := .services }}
+								        <tr><td>{{ $download.Identifier }}</td><td>{{ $download.Output }}</td></tr>
+						{{ end }}
+
+                    </tbody>
+				</table>
+
+</div>
