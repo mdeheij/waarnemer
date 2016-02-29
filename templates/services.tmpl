@@ -1,7 +1,74 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<html ng-app="myApp" ng-controller="customersCtrl">
     {{ template "head.html" }}
-    <body ng-controller="customersCtrl" >
+    <style>
+    @media (max-width: 970px) {
+
+            .verbose { display:none ; }
+
+    }
+    @media (max-width: 800px) {
+
+            .semi-verbose { display:none ; }
+
+    }
+    @media (max-width: 430px) {
+
+            .space-hugger { display:none ; }
+
+    }
+    </style>
+    <body>
+
+        <!-- This is the modal for more info about debt -->
+        <div id="service-info" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <a class="uk-modal-close uk-close"></a>
+                <h3>{{.angular}} selectedService.identifier }}</h3>
+                <dl class="uk-description-list-horizontal">
+                    <dt>Health:</dt>
+                        <dd><span ng-show="selectedService.Health == 2"><i class="fa fa-times   uk-badge uk-badge-danger"></i> Offline</span>
+                            <span ng-show="selectedService.Health == 1"><i class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i> Warning, offline but below threshold</span>
+                            <span ng-show="selectedService.Health == 0"><i class="fa fa-check uk-badge uk-badge-success"></i> Online</span>
+                            <span ng-show="selectedService.Health < 0"><i class="fa fa-circle-thin uk-badge"></i> Inactive, not checked (yet)</span>
+                            <span ng-show="selectedService.Health > 2"><i class="fa fa-circle-thin uk-badge"></i> ?? SHIT HIT THE FAN ??</span>
+                        </dd>
+                    <dt>Host:</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.host }}</dd>
+                    <dt>LastCheck</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.LastCheck }}</dd>
+                    <dt>Reaction time (ms):</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.RTime }}</dd>
+                    <dt>Timeout (s):</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.timeout }}</dd>
+                    <dt>Acknowledged:</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.acknowledged }}</dd>
+                    <dt>Action:</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.action.Name }}</dd>
+                    <dt>Command:</dt>
+                        <dd>&nbsp;<span>{{.angular}} selectedService.command }}</span></dd>
+                    <dt>Locked:</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.Lock }}</dd>
+                    <dt>Threshold:</dt>
+                        <dd>&nbsp;{{.angular}} selectedService.ThresholdCounter }} / {{.angular}} selectedService.threshold }}</dd>
+
+                </dl>
+
+                <div id="outputContainer" ng-show="selectedService.Output.length > 0">
+                    <h3>Output</h3>
+                    <pre style="white-space: normal; font-family: monospace, sans-serif;">{{.angular}} selectedService.Output }}</pre>
+                </div>
+
+                <button class="uk-button uk-button-large uk-button-primary" ng-click="updateCheck(selectedService).identifier)"><i class="fa fa-upload"></i> Reload this service</button>
+
+                <button class="uk-button uk-button-large uk-button-primary" ng-click="rescheduleCheck(selectedService.identifier)"><i class="fa fa-fast-forward"></i> Reschedule checking</button>
+                <!-- <button class="uk-button uk-button-primary" ng-click="setDone(clickedDebt, true)">Mark as paid</button>
+                <button class="uk-button uk-button-danger" ng-click="setDone(clickedDebt, false)">Mark as unpaid</button> -->
+                <!-- <form>
+                    <button class="uk-button uk-button-danger">Delete</button>
+                </form> -->
+            </div>
+        </div>
 
         <div>
 
@@ -10,20 +77,17 @@
           {{ template "menu-close.html" }}
 
 
-            <div style="padding-top: 50px">
+            <div style="padding-top: 25px">
 
 
                 <div class="uk-container uk-container-center">
-                    <h1>Services</h1>
-                    <!--  <h2>{{ .angular }} statusMsg }}</h2> -->
-                    <button ng-click="start()" class="uk-button uk-button-large uk-button-success" type="submit"><i class="fa fa-play"></i></button>
-                    <button ng-click="stop()" class="uk-button uk-button-large uk-button-danger" type="submit"><i class="fa fa-pause"></i></button>
-                    <button ng-click="updateList()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-cloud-download"></i> Update list</button>
+
+
+
                     <!-- NOT IMPLEMENTED YET <button ng-click="exportJSON()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-download"></i> Export JSON</button> -->
 
-                    <table ng-table="serviceTable" class="uk-table">
-                        <caption>Services {{ .angular }} search.identifier }}</caption>
-                        <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{ .angular }} x.Output  }}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true">
+                    <table ng-table="serviceTable" class="uk-table uk-table-striped">
+                        <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{ .angular }} x.Output  }}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true"  ng-click="openDetails(x)">
                             <td><i ng-show="x.Health == 2"  class="fa fa-times   uk-badge uk-badge-danger"></i>
                                 <i ng-show="x.Health == 1"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
                                 <i ng-show="x.Health == 0"  class="fa fa-check uk-badge uk-badge-success"></i>
@@ -31,21 +95,21 @@
                             </td>
                             <td><i ng-show="x.enabled"  class="fa fa-play"></i><i ng-hide="x.enabled" class="fa fa-pause"></i></td>
                             <td>{{ .angular }} x.identifier }}</td>
-                            <td>{{ .angular }} x.host  }}</td>
-                            <td>
+                            <td class="semi-verbose">{{ .angular }} x.host  }}</td>
+                            <td class="verbose">
                                 <i style="color: #0375d6;"   ng-show="x.Lock" class="fa fa-refresh fa-spin"></i>
                                 <i style="opacity: 0.1;" ng-hide="x.Lock" class="fa fa-refresh"></i>
                             </td>
-                            <td>
+                            <td class="verbose">
                                 <small>{{ .angular }} x.RTime  }}ms</small>
                                  <i ng-show="x.RTime > 1600"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
                             </td>
-                            <td>{{ .angular }} x.interval  }}</td>
-                            <td>{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
-                            <td>{{ .angular }} mySplit(x.command,0) }}</td>
-                            <td><i ng-show="x.Action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
-                            <td><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
-                            <td><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
+                            <td class="verbose">{{ .angular }} x.interval  }}</td>
+                            <td class="space-hugger">{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
+                            <td class="verbose">{{ .angular }} mySplit(x.command,0) }}</td>
+                            <td class="space-hugger"><i ng-show="x.Action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
+                            <td class="space-hugger"><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
+                            <td class="space-hugger"><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
                         </tr>
                     </table>
                 </div>

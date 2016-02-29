@@ -1,7 +1,12 @@
 <nav class="uk-navbar" id="monitoring-top-nav">
 	<div class="uk-container uk-container-center">
 		<ul class="uk-navbar-nav uk-hidden-small" id="mainmenu">
-			<li><a><b>Monitoring</b></a></li>
+
+			<li><a ng-click="start()"><i class="fa fa-play"></i> Start</a></li>
+			<li><a ng-click="stop()"><i class="fa fa-pause"></i> Stop</a></li>
+			<li><a ng-click="updateList()"><i class="fa fa-cloud-upload"></i> Reload list</a></li>
+
+
 		</ul>
 		<ul class="uk-navbar-nav uk-visible-small">
 			<li><a href="#my-id" class="uk-navbar-toggle" data-uk-offcanvas="{target:'#canvasmenucontainer'}"></a></li>
