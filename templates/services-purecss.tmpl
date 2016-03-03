@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="customersCtrl">
+
+    <head>
+        <script src="/assets/js/jquery-1.10.2.min.js"></script>
+        <script src="/assets/js/angular/angular.min.js"></script>
+        <script src="/assets/js/ng-order-object-by.js"></script>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <link rel="stylesheet" href="/assets/css/monitoring.css" />
+        <link rel="stylesheet" href="/assets/css/font-awesome-4.5.0/css/font-awesome.min.css">
+
+    </head>
+    <style>
+    @media (max-width: 970px) {
+
+            .verbose { display:none ; }
+
+    }
+    @media (max-width: 800px) {
+
+            .semi-verbose { display:none ; }
+
+    }
+    @media (max-width: 430px) {
+
+            .space-hugger { display:none ; }
+
+    }
+    </style>
+    <body>
+
+                    <table ng-table="serviceTable" class="pure-table pure-table-horizontal pure-table-striped" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Identifier</th>
+                                <th class="semi-verbose">Host</th>
+                                <th class="verbose">Lock</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true"  ng-click="openDetails(x)">
+                            <td><i ng-show="x.Health == 2"  class="fa fa-times   uk-badge uk-badge-danger"></i>
+                                <i ng-show="x.Health == 1"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
+                                <i ng-show="x.Health == 0"  class="fa fa-check uk-badge uk-badge-success"></i>
+                                <i ng-show="x.Health < 0"   class="fa fa-circle-thin uk-badge"></i>
+                            </td>
+                            <td><i ng-show="x.enabled"  class="fa fa-play"></i><i ng-hide="x.enabled" class="fa fa-pause"></i></td>
+                            <td>{{ .angular }} x.identifier }}</td>
+                            <td class="semi-verbose">{{ .angular }} x.host  }}</td>
+                            <td class="verbose">
+                                <i style="color: #0375d6;"   ng-show="x.Lock" class="fa fa-refresh fa-spin"></i>
+                                <i style="opacity: 0.1;" ng-hide="x.Lock" class="fa fa-refresh"></i>
+                            </td>
+                            <td class="verbose">
+                                <small>{{ .angular }} x.RTime  }}ms</small>
+                                 <i ng-show="x.RTime > 1600"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
+                            </td>
+                            <td class="verbose">{{ .angular }} x.interval  }}</td>
+                            <td class="space-hugger">{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
+                            <td class="verbose">{{ .angular }} mySplit(x.command,0) }}</td>
+                            <td class="space-hugger"><i ng-show="x.Action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
+                            <td class="space-hugger"><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
+                            <td class="space-hugger"><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script src="/assets/js/angular/services.js"></script>
+
+        </div>
+    </body>
+</html>

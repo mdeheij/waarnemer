@@ -87,7 +87,7 @@
                     <!-- NOT IMPLEMENTED YET <button ng-click="exportJSON()" class="uk-button uk-button-large uk-button-primary" type="submit"><i class="fa fa-download"></i> Export JSON</button> -->
 
                     <table ng-table="serviceTable" class="uk-table uk-table-striped">
-                        <tr data-uk-tooltip="{pos:'top'}"  ng-attr-title="{{ .angular }} x.Output  }}" ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true"  ng-click="openDetails(x)">
+                        <tr ng-class="{ 'service-disabled': x.enabled == false, 'health-2': x.Health == 2, 'health-1': x.Health == 1 }" ng-repeat="x in services | orderObjectBy : 'Health' : true"  ng-click="openDetails(x)">
                             <td><i ng-show="x.Health == 2"  class="fa fa-times   uk-badge uk-badge-danger"></i>
                                 <i ng-show="x.Health == 1"  class="fa fa-exclamation-triangle uk-badge uk-badge-warning"></i>
                                 <i ng-show="x.Health == 0"  class="fa fa-check uk-badge uk-badge-success"></i>
