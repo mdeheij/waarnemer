@@ -1,11 +1,11 @@
-.health-0 {
+.health-0 td {
 background-color: #0ff !important;
 }
-.health-1 {
-background-color: #fffceb !important;
+.health-1 td {
+background-color: #FFF4B9 !important;
 }
-.health-2 {
-background-color: #fff1f0 !important;
+.health-2 td {
+background-color: #FF8F87 !important;
 }
 .service-disabled {
 opacity: 0.4;
