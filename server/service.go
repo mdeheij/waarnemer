@@ -148,16 +148,13 @@ func getProblematicServices() []services.Service {
 	var s []services.Service
 
 	for item := range services.Services.IterBuffered() {
-
 		service := item.Val
 
 		if service.Health > 0 {
 			s = append(s, service)
 		}
 	}
-
 	return s
-
 }
 
 //servicesGetServicesEmbed returns the services as a nice embed for Grafana
