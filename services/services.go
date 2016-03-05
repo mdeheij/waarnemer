@@ -116,7 +116,6 @@ func (service Service) Update() string {
 		}
 	}
 	return "ERROR: SERVICE NOT FOUND"
-
 }
 
 func (service Service) getJSON() string {
@@ -263,11 +262,22 @@ func reloadServices() {
 	var count int
 	DebugMessage("━━━━━━━━━━[Loading services]━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
 	DebugMessage("TG BOT TOKEN: (" + configuration.Config.TelegramBotToken + ")")
+	var laatsteService Service
 	for _, service := range getServices() {
 		service.Health = -1 //you know nothing, monitoring
 		Services.Set(service.Identifier, service)
+		laatsteService = service
 		DebugMessage("Loaded " + service.Identifier)
 		count++
+	}
+
+	for i := 1; i <= 100; i++ {
+		identifier := "mdeheij.randgen." + strconv.Itoa(i)
+		copypasta := laatsteService
+		copypasta.Identifier = identifier
+		copypasta.Interval = 0
+		Services.Set(identifier, copypasta)
+		//fmt.Println(i, copypasta)
 	}
 
 	DebugMessage("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")

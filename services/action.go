@@ -51,6 +51,8 @@ func (a ActionHandler) Run() {
 				handlers.Telegram(a.service.Action.Telegramtarget, a.buildMessage())
 			case "rpe":
 				handlers.RemotePluginExecutor(a.service.Host)
+			case "none":
+				DebugMessage("Doing nothing")
 			default:
 				handlers.Telegram(a.service.Action.Telegramtarget, a.buildMessage())
 			}

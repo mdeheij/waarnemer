@@ -7,7 +7,7 @@ import (
 )
 
 //ShardCount is the number of map shards
-var ShardCount = 32
+var ShardCount = 128
 
 // TODO: Add Keys function which returns an array of keys for the map.
 

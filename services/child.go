@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+//CheckService accepts a command and returns a status code, output (stdout) and the reaction time
 func CheckService(command string) (status int, output string, rtime int64) {
 	now := time.Now()
 	timeStampHuman := now.Format(time.Stamp)
@@ -20,7 +21,7 @@ func CheckService(command string) (status int, output string, rtime int64) {
 	testArgs[0] = configuration.Config.BaseFolder + path + command
 
 	wrapperLocation := configuration.Config.BaseFolder + path + "wrapper"
-	DebugMessage("WrapperLocation: " + wrapperLocation)
+	//DebugMessage("WrapperLocation: " + wrapperLocation)
 	status, outputMsg := execute(wrapperLocation, testArgs)
 
 	elapsedTime := time.Since(now)
