@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	//"github.com/mdeheij/gotools"
+	"github.com/mdeheij/gin-csrf"
 	"github.com/mdeheij/monitoring/configuration"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
@@ -19,7 +19,7 @@ func getLoginUsername(c *gin.Context) string {
 	return ""
 }
 
-//Authenticate User
+//AuthRequired is authentication middleware for user
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := getLoginUsername(c)
@@ -34,13 +34,23 @@ func AuthRequired() gin.HandlerFunc {
 	}
 }
 
+var CsrfOpties csrf.Options
+
 func loginInit(r *gin.Engine) {
-	/*	authTokens := make(map[string]string)
-		authTokens["henk"] = "Twaalf"
-	*/
+
+	CsrfOpties = csrf.Options{
+		Secret: configuration.Config.SecureCookie,
+		ErrorFunc: func(c *gin.Context) {
+			c.String(400, "Please try again later")
+			c.Abort()
+		},
+	}
+
 	store := sessions.NewCookieStore([]byte(configuration.Config.SecureCookie))
 	store.Options(configuration.Config.CookieConfig)
 	r.Use(sessions.Sessions(configuration.Config.SecureCookieName, store))
+
+	r.Use(csrf.Middleware(CsrfOpties))
 
 	//group := r.Group("/login")
 	group := r.Group("/login")
@@ -74,11 +84,6 @@ func loginInit(r *gin.Engine) {
 	}
 }
 
-// func Encrypt(password string) string {
-// 	h := sha512.New()
-// 	h.Write(append([]byte(password)))
-// 	return fmt.Sprintf("%x", h.Sum([]byte{}))
-// }
 func GenerateFromPassword(password string) string {
 	// Hashing the password with the default cost of 10
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -96,6 +101,8 @@ func getUserByUsername(username string) configuration.User {
 	}
 	return configuration.User{}
 }
+
+//CheckPassword compares input to saved hash of password
 func CheckPassword(username string, password string) bool {
 
 	hashedPassword := getUserByUsername(username).Hash
@@ -107,11 +114,11 @@ func CheckPassword(username string, password string) bool {
 	errCompare := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if errCompare == nil {
 		return true
-	} else {
-		return false
 	}
 
+	return false
 }
+
 func loginPage(c *gin.Context) {
 	fmt.Println(getLoginUsername(c))
 	c.HTML(200, "login.tmpl", gin.H{

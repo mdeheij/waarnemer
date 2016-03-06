@@ -12,19 +12,19 @@ import (
 
 var garbage string
 
+//Services map containing all the services
 var Services = NewCMap()
 
+//DaemonActive are we currently checking services?
 var DaemonActive = false
+
+//DebugMode: verbose output
 var DebugMode = false
+
+//SilenceAll TODO: implement this
 var SilenceAll = false
 
-type ServicesConfiguration struct {
-	BaseFolder       string
-	TelegramBotToken string `json:"TelegramBotToken"`
-}
-
-var ServicesConfig ServicesConfiguration
-
+//Service struct containing a checks parameters
 type Service struct {
 	Identifier       string       `json:"identifier"`
 	Enabled          bool         `json:"enabled"`
@@ -43,39 +43,41 @@ type Service struct {
 	Output           string
 }
 
+//Enable a service
 func (service Service) Enable() {
-	//enable
 	service.Enabled = true
 	Services.Set(service.Identifier, service)
-	//commit naar db
 }
 
+//Disable a service
 func (service Service) Disable() {
-	//enable
 	service.Enabled = false
 	Services.Set(service.Identifier, service)
-	//commit naar db
 }
 
+//Reschedule Set last check date so early that it has to be rechecked ASAP
 func (service Service) Reschedule() {
 	service.LastCheck, _ = time.Parse(time.UnixDate, "Sat Mar  7 11:06:39.1234 PST 1990")
 	Services.Set(service.Identifier, service)
 }
 
+//EnableDebug Set debugmode to true
 func EnableDebug() {
 	DebugMode = true
 }
 
-func DebugMessage(text string) {
-	if DebugMode == true {
+//DebugMessage prints text when debugmode is true
+func DebugMessage(text interface{}) {
+	if DebugMode {
 		fmt.Println(text)
 	}
 }
 
+//UpdateList compare current map with fresh JSON getServices() and update values
 func UpdateList() {
 	//Do not start a new check while updating
-	jsonServices := getServices() //dit is geen map
-	jsonServicesMap := NewCMap()
+	jsonServices := getServices() //[]Service
+	jsonServicesMap := NewCMap()  //Concurrent string-Service map
 
 	for _, newService := range jsonServices {
 		//oldService := Services[newService.Identifier]
@@ -96,6 +98,7 @@ func UpdateList() {
 
 }
 
+//Update a service from fresh getServices()
 func (service Service) Update() string {
 	//Do not start a new check while updating
 	service.Lock = true
@@ -126,6 +129,7 @@ func (service Service) getJSON() string {
 	return string(b)
 }
 
+//StatusColor generates a command line colour based on health
 func StatusColor(text string, health int) string {
 
 	switch health {
@@ -229,18 +233,21 @@ func checkDispatcher() {
 
 		for i := 0; i < 1; i++ {
 			//	DebugMessage("● ")
-			time.Sleep(1 * time.Second)
+
+			time.Sleep(time.Second)
 			//DebugMessage("Next run in " + strconv.Itoa(3-i) + "..")
 		}
 
 	}
 }
 
+//Init service module
 func Init() {
-
 	reloadServices()
 	go checkDispatcher()
 }
+
+//Start daemon's checking
 func Start() {
 	DebugMessage("Starting..")
 	DaemonActive = true
@@ -250,6 +257,8 @@ func Start() {
 		a.Run()
 	}
 }
+
+//Stop daemon from checking
 func Stop() {
 	DebugMessage("Stopping..")
 	DaemonActive = false
@@ -260,8 +269,8 @@ func Stop() {
 func reloadServices() {
 	DebugMessage("Reading JSON")
 	var count int
-	DebugMessage("━━━━━━━━━━[Loading services]━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
-	DebugMessage("TG BOT TOKEN: (" + configuration.Config.TelegramBotToken + ")")
+
+	DebugMessage("Telegram Bot Token: (" + configuration.Config.TelegramBotToken + ")")
 	var laatsteService Service
 	for _, service := range getServices() {
 		service.Health = -1 //you know nothing, monitoring
@@ -271,7 +280,7 @@ func reloadServices() {
 		count++
 	}
 
-	for i := 1; i <= 100; i++ {
+	for i := 1; i <= 10; i++ {
 		identifier := "mdeheij.randgen." + strconv.Itoa(i)
 		copypasta := laatsteService
 		copypasta.Identifier = identifier
@@ -280,23 +289,26 @@ func reloadServices() {
 		//fmt.Println(i, copypasta)
 	}
 
-	DebugMessage("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┉┉┉┉┉┉┈┈┈ ")
+}
 
+//TestConfiguration checks if configuration can be loaded and shows amount of services
+func TestConfiguration() {
+	fmt.Println("Length:", len(getServices()), "services")
 }
 
 func getServices() []Service {
 	raw, err := ioutil.ReadFile(configuration.Config.BaseFolder + "services.json")
 	if err != nil {
+		DebugMessage("Cannot read file!")
 		panic(err)
 	} else {
-		DebugMessage("DEBUG REALLY VERBOSE func getServices() []Service")
-		DebugMessage("")
 		DebugMessage(string(raw))
 	}
 
 	var s []Service
 	errUnmarshal := json.Unmarshal(raw, &s)
 	if errUnmarshal != nil {
+		DebugMessage("Cannot parse JSON file!")
 		panic(err)
 	}
 	return s
