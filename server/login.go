@@ -80,7 +80,6 @@ func loginInit(r *gin.Engine) {
 			}
 
 		})
-
 	}
 }
 

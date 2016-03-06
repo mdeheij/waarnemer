@@ -20,7 +20,17 @@
     </style>
     <body>
 
-        <!-- This is the modal for more info about debt -->
+
+        <!-- This is the modal for configuring monitoring -->
+        <div id="daemon-info" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <a class="uk-modal-close uk-close"></a>
+                <h3>Daemon Controls</h3>
+
+            </div>
+        </div>
+
+        <!-- This is the modal for the selected service -->
         <div id="service-info" class="uk-modal">
             <div class="uk-modal-dialog">
                 <a class="uk-modal-close uk-close"></a>
@@ -70,6 +80,7 @@
             </div>
         </div>
 
+
         <div>
 
           {{ template "menu-open.html" }}
@@ -107,9 +118,7 @@
                             <td class="verbose">{{ .angular }} x.interval  }}</td>
                             <td class="space-hugger">{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
                             <td class="verbose">{{ .angular }} mySplit(x.command,0) }}</td>
-                            <td class="space-hugger"><i ng-show="x.Action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
-                            <td class="space-hugger"><a ng-click="updateCheck(x.identifier)"><i class="fa fa-upload"></i></a></td>
-                            <td class="space-hugger"><a ng-click="rescheduleCheck(x.identifier)"><i class="fa fa-fast-forward"></i></a></td>
+                            <td class="space-hugger"><i ng-show="x.action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
                         </tr>
                     </table>
                 </div>
