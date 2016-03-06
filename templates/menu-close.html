@@ -7,9 +7,9 @@
 		<div id="canvasmenucontainer" class="uk-offcanvas">
 			<div class="uk-offcanvas-bar">
 				<ul id="canvasmenu" class="uk-nav uk-nav-offcanvas" data-uk-nav>
-					<li class="uk-active"><a href="#home">Home</a></li>
-					<li><a href="#about">About</a></li>
-					<li><a href="#contact">Contact</a></li>
+					<li><a ng-click="start()"><i class="fa fa-play"></i> Start</a></li>
+					<li><a ng-click="stop()"><i class="fa fa-pause"></i> Stop</a></li>
+					<li><a ng-click="updateList()"><i class="fa fa-cloud-upload"></i> Reload list</a></li>
 				</ul>
 			</div>
 		</div>
