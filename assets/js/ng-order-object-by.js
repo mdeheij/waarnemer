@@ -10,7 +10,7 @@
           function isNumeric(n) {
             return !isNaN(parseFloat(n)) && isFinite(n);
           }
-          
+
           var filtered = [];
 
           angular.forEach(items, function(item, key) {
