@@ -8,3 +8,4 @@ monitoring
 client-daemon
 client-daemon/monitoringclientd
 nohup.out
+.archive/
