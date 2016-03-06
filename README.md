@@ -20,7 +20,7 @@ Uses JSON file(s) instead of a database such as MySQL! Nothing can break checkin
 
 ![Animation](https://i.imgur.com/7d44ndT.gif)
 
-## Samples
+## Sample configuration
 
 **services.json**
 
