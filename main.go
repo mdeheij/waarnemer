@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mdeheij/monitoring/configuration"
 	"github.com/mdeheij/monitoring/server"
+	"github.com/mdeheij/monitoring/services"
 	"os"
 )
 
@@ -22,7 +23,9 @@ func init() {
 
 func main() {
 
-	if testconfig == true {
+	if testconfig {
+		configuration.Init(config)
+		services.TestConfiguration()
 		fmt.Println("TODO: implement this")
 		os.Exit(2)
 	}
