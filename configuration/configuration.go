@@ -7,30 +7,31 @@ import (
 	"os"
 )
 
+//Config instance of Configuration struct
 var Config Configuration
 
+//Configuration struct
 type Configuration struct {
-	Hostname         string
-	BaseFolder       string
-	ResourceFolder   string
-	ServerAddress    string
-	ServerPort       int
-	Users            []User
-	SecureCookieName string
-	SecureCookie     string
-	// ChecksFolder               string
-	// ConfigFolder               string
-	// ConfigFile                 string
+	Hostname                   string
+	BaseFolder                 string
+	ResourceFolder             string
+	ServerAddress              string
+	ServerPort                 int
+	Users                      []User
+	SecureCookieName           string
+	SecureCookie               string
 	TelegramBotToken           string `json:"TelegramBotToken"`
 	TelegramNotificationTarget int32  `json:"TelegramNotificationTarget"`
 	CookieConfig               sessions.Options
 }
 
+//User struct used for login
 type User struct {
 	Username string
 	Hash     string
 }
 
+//Init ializes the configuration
 func Init(configfile string) {
 	var configContent []byte
 	var tempContent []byte
@@ -47,16 +48,6 @@ func Init(configfile string) {
 	tempContent, err = ioutil.ReadFile("/etc/monitoring/config.json")
 	if err == nil {
 		configContent = tempContent
-	}
-
-	// if configfile != "/etc/monitoring/config.json" {
-	// 	configContent, err = ioutil.ReadFile(configfile)
-	// } else {
-	// 	configContent, err = ioutil.ReadFile("config.json")
-	// }
-	//check if the chosen method of reading config file worked
-	if err != nil {
-		panic(err.Error())
 	}
 
 	errUnmarshal := json.Unmarshal(configContent, &Config)
