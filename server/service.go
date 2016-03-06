@@ -3,6 +3,8 @@ package server
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	//"github.com/mdeheij/gin-csrf"
+	"github.com/mdeheij/gin-csrf"
 	"github.com/mdeheij/monitoring/services"
 	"strconv"
 	"strings"
@@ -18,15 +20,22 @@ func servicesInit(r *gin.Engine, debug bool, autostart bool) {
 
 	services.Init()
 
-	monitoringGroup := r.Group("/services", AuthRequired())
+	frontendGroup := r.Group("/admin", AuthRequired())
 	{
-		monitoringGroup.GET("/", servicesPage)
-		monitoringGroup.GET("/start", servicesStart)
-		monitoringGroup.GET("/stop", servicesStop)
-		monitoringGroup.GET("/updatelist", servicesUpdateList)
-		monitoringGroup.GET("/update/:identifier", servicesUpdate)
-		monitoringGroup.GET("/reschedule/:identifier", servicesRescheduleCheck)
-		monitoringGroup.GET("/list.json", servicesGetServicesAsJSON)
+		frontendGroup.GET("/", guiPage)
+		frontendGroup.GET("/token", func(c *gin.Context) {
+			c.String(200, csrf.GetToken(c))
+		})
+	}
+	monitoringGroup := r.Group("/api/service/", AuthRequired())
+	{
+		// monitoringGroup.GET("/", servicesPage)
+		monitoringGroup.POST("/start", servicesStart)
+		monitoringGroup.POST("/stop", servicesStop)
+		monitoringGroup.POST("/updatelist", servicesUpdateList)
+		monitoringGroup.POST("/update/:identifier", servicesUpdate)
+		monitoringGroup.POST("/reschedule/:identifier", servicesRescheduleCheck)
+		monitoringGroup.GET("/list", servicesGetServicesAsJSON)
 		monitoringGroup.GET("/list/:identifier", servicesGetServicesWithIdentifier)
 	}
 	embedGroup := r.Group("/embed")
@@ -35,36 +44,21 @@ func servicesInit(r *gin.Engine, debug bool, autostart bool) {
 	}
 }
 
-func servicesPage(c *gin.Context) {
-
-	//services.Service
-
-	c.HTML(200, "services.tmpl", gin.H{
-		"title":    "Monitoring",
-		"subtitle": "Running: " + strconv.FormatBool(services.DaemonActive),
-		"angular":  "{{",
-	})
-
-}
 func servicesStart(c *gin.Context) {
-
 	services.Start()
-
 	c.JSON(200, gin.H{
 		"task":   "start",
 		"status": services.DaemonActive,
 	})
-
 }
+
 func servicesUpdateList(c *gin.Context) {
-
 	services.UpdateList()
-
 	c.JSON(200, gin.H{
 		"task": "updateList",
 	})
-
 }
+
 func servicesRescheduleCheck(c *gin.Context) {
 	identifier := c.Param("identifier")
 	var result string

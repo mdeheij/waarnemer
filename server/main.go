@@ -9,9 +9,8 @@ import (
 	"strconv"
 )
 
+//DebugMode sets verbose output
 var DebugMode bool
-
-//var updates = make(map[string]statistics.Update)
 
 func check(e error) {
 	if e != nil {
@@ -31,12 +30,7 @@ func base64Decode(str string) string {
 	return string(data)
 }
 
-// func getJsonVar(js *simplejson.Json, str string) string {
-// 	result, err := js.Get(str).String()
-// 	check(err)
-// 	return result
-// }
-
+//Setup router
 func Setup(debug bool, autostart bool) {
 
 	if debug == true {
@@ -51,7 +45,7 @@ func Setup(debug bool, autostart bool) {
 	r.Static("/assets", configuration.Config.ResourceFolder+"assets")
 
 	r.GET("/", func(c *gin.Context) {
-		c.Redirect(302, "/services/")
+		c.Redirect(301, "/admin/")
 	})
 
 	loginInit(r)
@@ -61,4 +55,13 @@ func Setup(debug bool, autostart bool) {
 	//fmt.Println("http://" + bindTarget)
 
 	r.Run(bindTarget) // listen and serve on 0.0.0.0:8080
+}
+
+func guiPage(c *gin.Context) {
+
+	c.HTML(200, "services.tmpl", gin.H{
+		"title":   "Monitoring",
+		"angular": "{{",
+	})
+
 }
