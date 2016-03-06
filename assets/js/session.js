@@ -14,9 +14,9 @@
                     $("#loginbtn").html("Login");
                 }
                  $("#canvasmenu").append('<li class="uk-nav-header">Options</li>');
-                 $("#canvasmenu").append("<li>"+$("#loginbtn").parent().html()+"</li>"); 
+                 $("#canvasmenu").append("<li>"+$("#loginbtn").parent().html()+"</li>");
               console.log(context.username);
             });
-            $("#canvasmenu").html('<li class="uk-nav-header">Navigation</li>'+$("#mainmenu").html());
-           
+            //$("#canvasmenu").html('<li class="uk-nav-header">Navigation</li>'+$("#mainmenu").html());
+
          });
