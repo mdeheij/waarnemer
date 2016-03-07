@@ -122,7 +122,7 @@ app.controller('customersCtrl', function($scope, $http) {
                   $('#refreshToolbarIcon').removeClass("fa-spin uk-text-warning");
             });
       };
-      $scope.pollingInterval = 20000;
+      $scope.pollingInterval = 2000;
       $scope.resetPolling();
       //var Timer=setInterval(refreshTable,$scope.pollingInterval);
       //DEBUG-console.log($scope.pollingInterval);

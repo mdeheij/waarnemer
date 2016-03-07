@@ -271,24 +271,13 @@ func reloadServices() {
 	var count int
 
 	DebugMessage("Telegram Bot Token: (" + configuration.Config.TelegramBotToken + ")")
-	var laatsteService Service
+
 	for _, service := range getServices() {
 		service.Health = -1 //you know nothing, monitoring
 		Services.Set(service.Identifier, service)
-		laatsteService = service
 		DebugMessage("Loaded " + service.Identifier)
 		count++
 	}
-
-	for i := 1; i <= 10; i++ {
-		identifier := "mdeheij.randgen." + strconv.Itoa(i)
-		copypasta := laatsteService
-		copypasta.Identifier = identifier
-		copypasta.Interval = 0
-		Services.Set(identifier, copypasta)
-		//fmt.Println(i, copypasta)
-	}
-
 }
 
 //TestConfiguration checks if configuration can be loaded and shows amount of services
