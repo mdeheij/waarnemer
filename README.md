@@ -12,6 +12,7 @@ Simple monitoring tool with web application written in Go.
 -   Acknowledging
 -   Notifications (e.g. Telegram)
 -   Action handling
+-   Embed functionality (for example in Grafana)
 -   Protection against nuclear bombs and zombie apocalypses
 
 ## Service checking and notifying
