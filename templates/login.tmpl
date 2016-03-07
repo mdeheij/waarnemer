@@ -23,7 +23,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfe7fa', end
     </script>
     <body ng-controller="MainCtrl" class="uk-height-1-1">
 
-    
+
 
         <div class="uk-vertical-align uk-text-center uk-height-1-1">
             <div class="uk-vertical-align-middle" style="width: 80%; max-width: 470px;" onload="document.loginForm.username.focus()">
@@ -34,10 +34,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfe7fa', end
 
                     <form class="uk-form" name="loginForm" action="/login" method="POST">
                         <div class="uk-form-row">
-                            <input class="uk-width-1-1 uk-form-large" name="username" value="{{.user}}" type="text" style="width: 100%" placeholder="Username">
+                            <input class="uk-width-1-1 uk-form-large" name="username" value="{{.user}}" type="text" style="width: 100%" placeholder="Username"/>
                         </div>
                         <div class="uk-form-row">
-                            <input class="uk-width-1-1 uk-form-large" type="password" name="password" style="width: 100%" placeholder="Password">
+                            <input class="uk-width-1-1 uk-form-large" type="password" name="password" style="width: 100%" placeholder="Password"/>
                         </div>
                         <div class="uk-form-row">
                             <div class="uk-text-center">
@@ -46,7 +46,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfe7fa', end
                                 </button>
                             </div>
                         </div>
-                        <input type="hidden" name="" value="">
+                        <input value="{{ .csrf }}" type="hidden" name="_csrf" style="display:none"/>
                     </form>
                 </div>
             </div>
