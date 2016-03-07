@@ -122,6 +122,7 @@ func loginPage(c *gin.Context) {
 	fmt.Println(getLoginUsername(c))
 	c.HTML(200, "login.tmpl", gin.H{
 		"user":     getLoginUsername(c),
+		"csrf":     csrf.GetToken(c),
 		"subtitle": "Easy server statistics monitoring",
 	})
 }
