@@ -106,6 +106,11 @@ app.controller('customersCtrl', function($scope, $http) {
                   $scope.services = response;
             });
       };
+      $scope.disableTimer = function() {
+            console.log("[disableTimer] refreshing should be disabled now");
+            $scope.timerActive = false; //visualise auto refreshing is not active
+            clearInterval(Timer);
+      };
       $scope.resetPolling = function() {
             notify("<i class='uk-icon-check'></i> Polling time is set to " + $scope.pollingInterval);
             //DEBUG-console.log("resetPolling -- consolelog - " + $scope.pollingInterval);
@@ -117,10 +122,12 @@ app.controller('customersCtrl', function($scope, $http) {
       function refreshTable() {
             //DEBUG-console.log("refresh!");
             $('#refreshToolbarIcon').addClass("fa-spin uk-text-warning");
-            $http.get("/api/service/list").success(function(response) {
-                  $scope.services = response;
-                  $('#refreshToolbarIcon').removeClass("fa-spin uk-text-warning");
-            });
+
+                $http.get("/api/service/list").success(function(response) {
+                      $scope.services = response;
+                      $('#refreshToolbarIcon').removeClass("fa-spin uk-text-warning");
+                });
+
       };
       $scope.pollingInterval = 2000;
       $scope.resetPolling();
@@ -134,7 +141,7 @@ function notify(message) {
      UIkit.notify({
            message: message,
            status: 'info',
-           timeout: 500,
+           timeout: 700,
            pos: 'bottom-right'
      });
 }
