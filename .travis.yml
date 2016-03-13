@@ -1,11 +1,11 @@
 language: go
 go:
-  - 1.5.1
   - tip
 install:
   - go get github.com/gin-gonic/contrib/sessions
   - go get github.com/gin-gonic/gin
   - go get github.com/mdeheij/gin-csrf
   - go get github.com/bartholdbos/golegram
+  - go get golang.org/x/crypto/bcrypt
 notifications:
   email: true
