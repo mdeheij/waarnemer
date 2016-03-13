@@ -6,5 +6,6 @@ install:
   - go get github.com/gin-gonic/contrib/sessions
   - go get github.com/gin-gonic/gin
   - go get github.com/mdeheij/gin-csrf
+  - go get github.com/bartholdbos/golegram
 notifications:
   email: true
