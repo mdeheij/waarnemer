@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"io/ioutil"
 	"os"
@@ -21,14 +22,22 @@ type Configuration struct {
 	SecureCookieName           string
 	SecureCookie               string
 	TelegramBotToken           string `json:"TelegramBotToken"`
-	TelegramNotificationTarget int32  `json:"TelegramNotificationTarget"`
+	TelegramNotificationTarget string `json:"TelegramNotificationTarget"`
 	CookieConfig               sessions.Options
+	// Public                     []PublicGroup
+	//TODO: coming soon in a new release
 }
 
 //User struct used for login
 type User struct {
 	Username string
 	Hash     string
+}
+
+//PublicGroup struct used to define public available groups
+type PublicGroup struct {
+	Name     string
+	Services []string
 }
 
 //Init ializes the configuration
@@ -52,6 +61,7 @@ func Init(configfile string) {
 
 	errUnmarshal := json.Unmarshal(configContent, &Config)
 	if errUnmarshal != nil {
+		fmt.Println("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
 		panic(err.Error())
 	}
 
