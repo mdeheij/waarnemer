@@ -41,7 +41,7 @@ func CheckService(command string) (status int, output string, rtime int64) {
 func execute(cmdName string, cmdArgs []string) (status int, output string) {
 	// TODO: Check if cmdName file exists, returning some high error if not.
 	cmd := exec.Command(cmdName, cmdArgs...)
-	//	cmd := exec.Command("cat", "8.8.1.6", "-c 1") //complete bullshit for exit code simulation
+
 	cmdOutput := &bytes.Buffer{}
 	errOutput := &bytes.Buffer{}
 	fail := false
