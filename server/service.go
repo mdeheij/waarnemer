@@ -38,9 +38,10 @@ func servicesInit(r *gin.Engine, debug bool, autostart bool) {
 		monitoringGroup.GET("/list", servicesGetServicesAsJSON)
 		monitoringGroup.GET("/list/:identifier", servicesGetServicesWithIdentifier)
 	}
-	embedGroup := r.Group("/embed")
+	publicGroup := r.Group("/public")
 	{
-		embedGroup.GET("/", servicesGetServicesEmbed)
+		//embedGroup.GET("/embed", servicesGetServicesEmbed)
+		publicGroup.GET("/status/:group", servicesGetPublicServices)
 	}
 }
 
@@ -138,6 +139,13 @@ func servicesGetServicesWithIdentifier(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
+//PublicService is a stripped down struct which can be used for public status pages
+type PublicService struct {
+	Identifier  string
+	Description string
+	Online      bool
+}
+
 func getProblematicServices() []services.Service {
 	var s []services.Service
 
@@ -149,6 +157,22 @@ func getProblematicServices() []services.Service {
 		}
 	}
 	return s
+}
+
+func getPublicServices(group string) []PublicService {
+
+	var publicServices []PublicService
+
+	for item := range services.Services.IterBuffered() {
+		originalService := item.Val
+
+		publicService := PublicService{Identifier: originalService.Identifier, Description: originalService.Description}
+		if originalService.Health > 0 {
+			publicService.Online = true
+		}
+		publicServices = append(publicServices, publicService)
+	}
+	return publicServices
 }
 
 //servicesGetServicesEmbed returns the services as a nice embed for Grafana
@@ -164,4 +188,16 @@ func servicesGetServicesEmbed(c *gin.Context) {
 	})
 	//TODO: think how I'm going to build this
 	//	c.JSON(200, gin.H{})
+}
+
+//servicesGetServicesEmbed returns the services as a nice embed for Grafana
+func servicesGetPublicServices(c *gin.Context) {
+
+	group := c.Param("group")
+
+	//test, _ := services.Services.Get("company.dns.ns1")
+
+	c.JSON(200, gin.H{
+		"Zooi": getPublicServices(group),
+	})
 }
