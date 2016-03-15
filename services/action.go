@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/mdeheij/monitoring/services/handlers"
 	"strconv"
-	"time"
+	//	"time"
 )
 
 type ActionConfig struct {
 	Name           string
-	Telegramtarget []int32
+	Telegramtarget []string
 	Rpecommand     string
 }
 
@@ -25,21 +25,21 @@ func NewAction(service Service) *ActionHandler {
 }
 
 func (a ActionHandler) buildMessage() (msg string) {
-	timestamp := a.service.LastCheck.Format(time.Stamp)
+	//	timestamp := a.service.LastCheck.Format(time.Stamp)
 
 	thresholdCounting := strconv.Itoa(a.service.ThresholdCounter) + "/" + strconv.Itoa(a.service.Threshold)
 
 	actionTypeString := ""
 	switch a.service.Health {
 	case 2:
-		actionTypeString = "🔴 PROBLEM"
+		actionTypeString = "🔴"
 	case 0:
-		actionTypeString = "🔵 RECOVERY"
+		actionTypeString = "🔵"
 	case 1:
-		actionTypeString = "⚠️ WARNING"
+		actionTypeString = "⚠️"
 	}
 
-	return "*" + actionTypeString + " - " + timestamp + "*\n" + a.service.Identifier + " (" + a.service.Host + ")" + "\nThreshold: " + thresholdCounting + "\nOutput: _" + a.service.Output + "_"
+	return "" + actionTypeString + " *" + a.service.Identifier + "* (" + a.service.Host + ")" + "\nThreshold: " + thresholdCounting + "\nOutput: _" + a.service.Output + "_"
 }
 
 func (a ActionHandler) Run() {
