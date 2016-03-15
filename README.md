@@ -2,6 +2,8 @@
 
 Simple monitoring tool with web application written in Go.
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/mdeheij/monitoring)](https://goreportcard.com/report/github.com/mdeheij/monitoring) [![Build Status](https://travis-ci.org/mdeheij/monitoring.svg?branch=master)](https://travis-ci.org/mdeheij/monitoring)
+
 ## Features
 
 -   Very lightweight

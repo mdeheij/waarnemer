@@ -2,20 +2,13 @@ package services
 
 import (
 	//"flag"
-	"fmt"
+	//	"fmt"
 	//"os"
 	//"github.com/davecgh/go-spew/spew"
-	"github.com/mdeheij/monitoring/configuration"
+	//"github.com/mdeheij/monitoring/configuration"
 	"testing"
 	//"time"
 )
-
-func TestServiceInit(t *testing.T) {
-	DebugMode = false
-	fmt.Println("ServicesConfig")
-	configuration.Init("../config.json")
-	reloadServices()
-}
 
 func TestReload(t *testing.T) {
 	identifier := "github.web"
