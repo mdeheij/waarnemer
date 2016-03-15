@@ -24,8 +24,7 @@ type Configuration struct {
 	TelegramBotToken           string `json:"TelegramBotToken"`
 	TelegramNotificationTarget string `json:"TelegramNotificationTarget"`
 	CookieConfig               sessions.Options
-	// Public                     []PublicGroup
-	//TODO: coming soon in a new release
+	Public                     []PublicGroup
 }
 
 //User struct used for login
@@ -49,20 +48,21 @@ func Init(configfile string) {
 	tempContent, err = ioutil.ReadFile(configfile)
 	if err == nil {
 		configContent = tempContent
-	}
-	tempContent, err = ioutil.ReadFile("config.json")
-	if err == nil {
-		configContent = tempContent
-	}
-	tempContent, err = ioutil.ReadFile("/etc/monitoring/config.json")
-	if err == nil {
-		configContent = tempContent
+	} else {
+		fmt.Println("Config file not in default/specified location, trying local folder..")
+		tempContent, err = ioutil.ReadFile("config.json")
+		if err == nil {
+			fmt.Println("Found it.")
+			configContent = tempContent
+		} else {
+			fmt.Println("Not found in folder! Panic!")
+		}
 	}
 
 	errUnmarshal := json.Unmarshal(configContent, &Config)
 	if errUnmarshal != nil {
 		fmt.Println("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
-		panic(err.Error())
+		panic(errUnmarshal.Error())
 	}
 
 	name, err := os.Hostname()
