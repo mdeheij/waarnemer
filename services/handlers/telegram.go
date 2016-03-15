@@ -13,7 +13,7 @@ type instanceHolder struct {
 var instance instanceHolder
 
 //Telegram sends a Telegram message to one or more users by their unique ID
-func Telegram(targets []int32, message string) {
+func Telegram(targets []string, message string) {
 	var err error
 
 	fmt.Println("[Telegram] Sending to following target(s): ", targets)
