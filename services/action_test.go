@@ -3,8 +3,9 @@ package services
 import (
 	"flag"
 	"fmt"
-	"github.com/mdeheij/monitoring/configuration"
 	"testing"
+
+	"github.com/mdeheij/monitoring/configuration"
 )
 
 var target string
