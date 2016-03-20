@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/mdeheij/monitoring/services/handlers"
 	"strconv"
-	//	"time"
+	"time"
 )
 
 type ActionConfig struct {
 	Name           string
-	Telegramtarget []string
+	Telegramtarget []int32
 	Rpecommand     string
 }
 
@@ -21,30 +21,13 @@ type ActionHandler struct {
 func NewAction(service Service) *ActionHandler {
 	var a ActionHandler = ActionHandler{name: "telegram"}
 	a.service = service
+
 	return &a
 }
 
-func (a ActionHandler) buildMessage() (msg string) {
-	//	timestamp := a.service.LastCheck.Format(time.Stamp)
-
-	thresholdCounting := strconv.Itoa(a.service.ThresholdCounter) + "/" + strconv.Itoa(a.service.Threshold)
-
-	actionTypeString := ""
-	switch a.service.Health {
-	case 2:
-		actionTypeString = "🔴"
-	case 0:
-		actionTypeString = "🔵"
-	case 1:
-		actionTypeString = "⚠️"
-	}
-
-	return "" + actionTypeString + " *" + a.service.Identifier + "* (" + a.service.Host + ")" + "\nThreshold: " + thresholdCounting + "\nOutput: _" + a.service.Output + "_"
-}
-
 func (a ActionHandler) Run() {
-	if SilenceAll == false {
-		if a.service.Acknowledged != true {
+	if !SilenceAll {
+		if !a.service.Acknowledged {
 
 			switch a.service.Action.Name {
 			case "telegram":
@@ -56,9 +39,25 @@ func (a ActionHandler) Run() {
 			default:
 				handlers.Telegram(a.service.Action.Telegramtarget, a.buildMessage())
 			}
-
 		}
 	} else {
 		fmt.Println("Silenced.")
 	}
+}
+
+func (a ActionHandler) buildMessage() (msg string) {
+	timestamp := a.service.LastCheck.Format(time.Stamp)
+	thresholdCounting := strconv.Itoa(a.service.ThresholdCounter) + "/" + strconv.Itoa(a.service.Threshold)
+	actionTypeString := ""
+
+	switch a.service.Health {
+	case 2:
+		actionTypeString = "🔴 PROBLEM"
+	case 0:
+		actionTypeString = "🔵 RECOVERY"
+	case 1:
+		actionTypeString = "⚠️ WARNING"
+	}
+
+	return fmt.Sprintf("*%s - %s*\n %s (%s)\nThreshold: %s\nOutput: _%s_", actionTypeString, timestamp, a.service.Identifier, a.service.Host, thresholdCounting, a.service.Output)
 }
