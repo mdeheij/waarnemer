@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -22,9 +23,12 @@ func getLoginUsername(c *gin.Context) string {
 //AuthRequired is authentication middleware for user
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := getLoginUsername(c)
+		user, err := getUserByUsername(getLoginUsername(c))
+		if err != nil {
+			fmt.Println(err)
+		}
 
-		if len(getUserByUsername(username).Username) > 0 { //TODO fix this
+		if len(user.Username) > 0 { //TODO fix this once again
 			//c.Next()
 			c.Next()
 		} else {
@@ -34,11 +38,11 @@ func AuthRequired() gin.HandlerFunc {
 	}
 }
 
-var CsrfOpties csrf.Options
+var CsrfOptions csrf.Options
 
 func loginInit(r *gin.Engine) {
 
-	CsrfOpties = csrf.Options{
+	CsrfOptions = csrf.Options{
 		Secret: configuration.Config.SecureCookie,
 		ErrorFunc: func(c *gin.Context) {
 			c.String(400, "Please try again later")
@@ -50,7 +54,7 @@ func loginInit(r *gin.Engine) {
 	store.Options(configuration.Config.CookieConfig)
 	r.Use(sessions.Sessions(configuration.Config.SecureCookieName, store))
 
-	r.Use(csrf.Middleware(CsrfOpties))
+	r.Use(csrf.Middleware(CsrfOptions))
 
 	//group := r.Group("/login")
 	group := r.Group("/login")
@@ -92,22 +96,24 @@ func GenerateFromPassword(password string) string {
 	return string(hashedPassword)
 }
 
-func getUserByUsername(username string) configuration.User {
+func getUserByUsername(username string) (configuration.User, error) {
 	for _, v := range configuration.Config.Users {
 		if v.Username == username {
-			return v
+			return v, nil
 		}
 	}
-	return configuration.User{}
+	return configuration.User{}, errors.New("No user found in configuration.")
 }
 
 //CheckPassword compares input to saved hash of password
 func CheckPassword(username string, password string) bool {
 
-	hashedPassword := getUserByUsername(username).Hash
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	user, err := getUserByUsername(username)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	hashedPassword := user.Hash
 	//TODO implement error handling
 
 	errCompare := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
