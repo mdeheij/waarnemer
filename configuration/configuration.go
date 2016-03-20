@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"io/ioutil"
 	"os"
@@ -21,14 +22,21 @@ type Configuration struct {
 	SecureCookieName           string
 	SecureCookie               string
 	TelegramBotToken           string `json:"TelegramBotToken"`
-	TelegramNotificationTarget int32  `json:"TelegramNotificationTarget"`
+	TelegramNotificationTarget string `json:"TelegramNotificationTarget"`
 	CookieConfig               sessions.Options
+	Public                     []PublicGroup
 }
 
 //User struct used for login
 type User struct {
 	Username string
 	Hash     string
+}
+
+//PublicGroup struct used to define public available groups
+type PublicGroup struct {
+	Name     string
+	Services []string
 }
 
 //Init ializes the configuration
@@ -40,19 +48,21 @@ func Init(configfile string) {
 	tempContent, err = ioutil.ReadFile(configfile)
 	if err == nil {
 		configContent = tempContent
-	}
-	tempContent, err = ioutil.ReadFile("config.json")
-	if err == nil {
-		configContent = tempContent
-	}
-	tempContent, err = ioutil.ReadFile("/etc/monitoring/config.json")
-	if err == nil {
-		configContent = tempContent
+	} else {
+		fmt.Println("Config file not in default/specified location, trying local folder..")
+		tempContent, err = ioutil.ReadFile("config.json")
+		if err == nil {
+			fmt.Println("Found it.")
+			configContent = tempContent
+		} else {
+			fmt.Println("Not found in folder! Panic!")
+		}
 	}
 
 	errUnmarshal := json.Unmarshal(configContent, &Config)
 	if errUnmarshal != nil {
-		panic(err.Error())
+		fmt.Println("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
+		panic(errUnmarshal.Error())
 	}
 
 	name, err := os.Hostname()

@@ -3,29 +3,36 @@ package services
 import (
 	"flag"
 	"fmt"
+	"github.com/mdeheij/monitoring/configuration"
 	"testing"
 )
 
-var target int
+var target string
+var token string
 
 func init() {
-	flag.IntVar(&target, "target", 0, "The telegram target")
+	flag.StringVar(&target, "target", "", "Telegram Target")
+	flag.StringVar(&token, "token", "", "Telegram Bot Token")
 	flag.Parse()
+
 }
 
-func NoTestAction(t *testing.T) {
+func TestAction(t *testing.T) {
 	//fmt.Println(ServicesConfig)
 	//fmt.Println("[Testing]")
 
-	if target == 0 {
-		fmt.Println("Telgeram Target ID is required. Use --target CHAT_ID")
-		t.Fail()
+	if target == "" || token == "" {
+		fmt.Println("Token and/or target is not set! TEST WILL NOT RUN")
+		t.SkipNow()
+
+	} else {
+		configuration.Config.TelegramBotToken = token
+		configuration.Config.TelegramNotificationTarget = target
 	}
-	//tgtg := []int32{4009810, -62946040}
-	cijfer := int32(target)
-	tgtg := []int32{cijfer}
-	ac := ActionConfig{Name: "telegram", Telegramtarget: tgtg}
-	s := Service{Host: "localhost", Identifier: "test", Threshold: 3, Health: 1, Output: "OK", Action: ac}
+
+	tgSlice := []string{target}
+	ac := ActionConfig{Name: "telegram", Telegramtarget: tgSlice}
+	s := Service{Host: "go test", Identifier: "TestAction", Threshold: 3, Health: 1, Output: "OK", Action: ac}
 
 	a := NewAction(s)
 	a.Run()
@@ -34,4 +41,6 @@ func NoTestAction(t *testing.T) {
 
 	a = NewAction(s)
 	a.Run()
+
+	fmt.Println("A test message should be sent. Please verify.")
 }

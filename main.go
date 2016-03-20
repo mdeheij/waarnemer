@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	//"fmt"
 	"github.com/mdeheij/monitoring/configuration"
 	"github.com/mdeheij/monitoring/server"
 	"github.com/mdeheij/monitoring/services"
@@ -25,9 +25,12 @@ func main() {
 
 	if testconfig {
 		configuration.Init(config)
-		services.TestConfiguration()
-		fmt.Println("TODO: implement this")
-		os.Exit(2)
+		err := services.TestConfiguration()
+		if err != nil {
+			panic(err)
+		} else {
+			os.Exit(0)
+		}
 	}
 
 	configuration.Init(config)

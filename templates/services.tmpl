@@ -58,7 +58,7 @@
                     <dt>Command:</dt>
                         <dd>&nbsp;<span>{{.angular}} selectedService.command }}</span></dd>
                     <dt>Locked:</dt>
-                        <dd>&nbsp;{{.angular}} selectedService.Lock }}</dd>
+                        <dd>&nbsp;{{.angular}} selectedService.IsLocked }}</dd>
                     <dt>Threshold:</dt>
                         <dd>&nbsp;{{.angular}} selectedService.ThresholdCounter }} / {{.angular}} selectedService.threshold }}</dd>
 
@@ -108,8 +108,8 @@
                             <td>{{ .angular }} x.identifier }}</td>
                             <td class="semi-verbose">{{ .angular }} x.host  }}</td>
                             <td class="verbose">
-                                <i style="color: #0375d6;"   ng-show="x.Lock" class="fa fa-refresh fa-spin"></i>
-                                <i style="opacity: 0.1;" ng-hide="x.Lock" class="fa fa-refresh"></i>
+                                <i style="color: #0375d6;"   ng-show="x.IsLocked" class="fa fa-refresh fa-spin"></i>
+                                <i style="opacity: 0.1;" ng-hide="x.IsLocked" class="fa fa-refresh"></i>
                             </td>
                             <td class="verbose">
                                 <small>{{ .angular }} x.RTime  }}ms</small>
@@ -118,6 +118,7 @@
                             <td class="verbose">{{ .angular }} x.interval  }}</td>
                             <td class="space-hugger">{{ .angular }} x.ThresholdCounter  }}/{{ .angular }} x.threshold  }}</td>
                             <td class="verbose">{{ .angular }} mySplit(x.command,0) }}</td>
+                            <td class="space-hugger"><i ng-show="x.acknowledged == true" class="fa fa-microphone-slash"></i></td>
                             <td class="space-hugger"><i ng-show="x.action.Name == 'telegram'" class="fa fa-paper-plane"></i></td>
                         </tr>
                     </table>
