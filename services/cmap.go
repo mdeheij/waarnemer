@@ -11,17 +11,17 @@ var ShardCount = 128
 
 // TODO: Add Keys function which returns an array of keys for the map.
 
-//ConcurrentMap is a "thread" safe map of type string:Service.
-//To avoid lock bottlenecks this map is dived to several (ShardCount) map shards.
+// ConcurrentMap is a "thread" safe map of type string:Service.
+// To avoid lock bottlenecks this map is dived to several (ShardCount) map shards.
 type ConcurrentMap []*ConcurrentMapShared
 
-//ConcurrentMapShared is the struct used in ConcurrentMap
+// ConcurrentMapShared is the struct used in ConcurrentMap
 type ConcurrentMapShared struct {
 	items        map[string]Service
 	sync.RWMutex // Read Write mutex, guards access to internal map.
 }
 
-//NewCMap Creates a new concurrent map.
+// NewCMap creates a new concurrent map.
 func NewCMap() ConcurrentMap {
 	m := make(ConcurrentMap, ShardCount)
 	for i := 0; i < ShardCount; i++ {
@@ -30,14 +30,14 @@ func NewCMap() ConcurrentMap {
 	return m
 }
 
-//GetShard returns shard under given key
+//GetShard returns a shard based on the given key
 func (m ConcurrentMap) GetShard(key string) *ConcurrentMapShared {
 	hasher := fnv.New32()
 	hasher.Write([]byte(key))
 	return m[int(hasher.Sum32())%ShardCount]
 }
 
-//Set the given value under the specified key.
+// Set sets the given value to the specified key.
 func (m *ConcurrentMap) Set(key string, value Service) {
 	// Get map shard.
 	shard := m.GetShard(key)
@@ -46,9 +46,9 @@ func (m *ConcurrentMap) Set(key string, value Service) {
 	shard.items[key] = value
 }
 
-//Get retrieves an element from map under given key.
+// Get retrieves an element from the map based on the given key.
 func (m ConcurrentMap) Get(key string) (Service, bool) {
-	// Get shard
+	// Get shard.
 	shard := m.GetShard(key)
 	shard.RLock()
 	defer shard.RUnlock()
@@ -58,7 +58,7 @@ func (m ConcurrentMap) Get(key string) (Service, bool) {
 	return val, ok
 }
 
-//Count  Returns the number of elements within the map.
+// Count returns the number of elements within the map.
 func (m ConcurrentMap) Count() int {
 	count := 0
 	for i := 0; i < ShardCount; i++ {
@@ -70,9 +70,9 @@ func (m ConcurrentMap) Count() int {
 	return count
 }
 
-//Has  Looks up an item under specified key
+// Has looks up an item under the specified key
 func (m *ConcurrentMap) Has(key string) bool {
-	// Get shard
+	// Get shard.
 	shard := m.GetShard(key)
 	shard.RLock()
 	defer shard.RUnlock()
@@ -82,7 +82,7 @@ func (m *ConcurrentMap) Has(key string) bool {
 	return ok
 }
 
-//Remove an element from the map.
+// Remove removes an element from the map based on the provided key.
 func (m *ConcurrentMap) Remove(key string) {
 	// Try to get shard.
 	shard := m.GetShard(key)
@@ -91,54 +91,62 @@ func (m *ConcurrentMap) Remove(key string) {
 	delete(shard.items, key)
 }
 
-//IsEmpty checks if map is empty.
+// IsEmpty checks if the map is empty.
 func (m *ConcurrentMap) IsEmpty() bool {
 	return m.Count() == 0
 }
 
-//Tuple is used by the Iter & IterBuffered functions to wrap two variables together over a channel,
+// Tuple is used by the Iter & IterBuffered functions to wrap two variables together over a channel,
 type Tuple struct {
 	Key string
 	Val Service
 }
 
-//Iter Returns an iterator which could be used in a for range loop.
+// Iter returns an iterator which could be used in a for range loop.
 func (m ConcurrentMap) Iter() <-chan Tuple {
 	ch := make(chan Tuple)
+
 	go func() {
-		// Foreach shard.
+		// Iterate each shard.
 		for _, shard := range m {
-			// Foreach key, value pair.
 			shard.RLock()
+
+			// Iterate each key, value pair.
 			for key, val := range shard.items {
 				ch <- Tuple{key, val}
 			}
+
 			shard.RUnlock()
 		}
 		close(ch)
 	}()
+
 	return ch
 }
 
-//IterBuffered Returns a buffered iterator which could be used in a for range loop.
+// IterBuffered returns a buffered iterator which could be used in a for range loop.
 func (m ConcurrentMap) IterBuffered() <-chan Tuple {
 	ch := make(chan Tuple, m.Count())
+
 	go func() {
-		// Foreach shard.
+		// Iterate each shard.
 		for _, shard := range m {
-			// Foreach key, value pair.
+			// Iterate each key, value pair.
 			shard.RLock()
+
 			for key, val := range shard.items {
 				ch <- Tuple{key, val}
 			}
+
 			shard.RUnlock()
 		}
 		close(ch)
 	}()
+
 	return ch
 }
 
-//MarshalJSON reviles ConcurrentMap "private" variables to json marshal.
+// MarshalJSON reviles ConcurrentMap "private" variables to JSON marshal.
 func (m ConcurrentMap) MarshalJSON() ([]byte, error) {
 	// Create a temporary map, which will hold all item spread across shards.
 	tmp := make(map[string]Service)
@@ -147,12 +155,12 @@ func (m ConcurrentMap) MarshalJSON() ([]byte, error) {
 	for item := range m.Iter() {
 		tmp[item.Key] = item.Val
 	}
+
 	return json.Marshal(tmp)
 }
 
 //UnmarshalJSON is the reverse process of Marshal.
 func (m *ConcurrentMap) UnmarshalJSON(b []byte) (err error) {
-
 	tmp := make(map[string]Service)
 
 	// Unmarshal into a single map.
@@ -164,6 +172,7 @@ func (m *ConcurrentMap) UnmarshalJSON(b []byte) (err error) {
 	for key, val := range tmp {
 		m.Set(key, val)
 	}
+
 	return nil
 }
 

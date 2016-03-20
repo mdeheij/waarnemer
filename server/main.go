@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/base64"
 	"fmt"
-	//"github.com/bitly/go-simplejson"
 	"github.com/gin-gonic/gin"
 	"github.com/mdeheij/monitoring/configuration"
 	"strconv"
@@ -12,31 +11,11 @@ import (
 //DebugMode sets verbose output
 var DebugMode bool
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func base64Encode(str string) string {
-	return base64.StdEncoding.EncodeToString([]byte(str))
-}
-
-func base64Decode(str string) string {
-	data, err := base64.StdEncoding.DecodeString(str)
-	if err != nil {
-		fmt.Println("Error: " + err.Error())
-	}
-	return string(data)
-}
-
-//Setup router
+//Setup initializes routers, login and services.
 func Setup(debug bool, autostart bool) {
+	DebugMode = debug
 
-	if debug == true {
-		DebugMode = true
-	} else {
-		DebugMode = false
+	if !DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -51,17 +30,33 @@ func Setup(debug bool, autostart bool) {
 	loginInit(r)
 	servicesInit(r, debug, autostart)
 
-	bindTarget := configuration.Config.ServerAddress + ":" + strconv.Itoa(configuration.Config.ServerPort)
-	//fmt.Println("http://" + bindTarget)
+	// If configuration values are empty, Gin will listen and serve on 0.0.0.0:8080.
+	r.Run(fmt.Sprintf("%s:%s", configuration.Config.ServerAddress, strconv.Itoa(configuration.Config.ServerPort)))
+}
 
-	r.Run(bindTarget) // listen and serve on 0.0.0.0:8080
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func base64Encode(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
+}
+
+func base64Decode(str string) string {
+	data, err := base64.StdEncoding.DecodeString(str)
+
+	if err != nil {
+		fmt.Println("Error: " + err.Error())
+	}
+
+	return string(data)
 }
 
 func guiPage(c *gin.Context) {
-
 	c.HTML(200, "services.tmpl", gin.H{
 		"title":   "Monitoring",
 		"angular": "{{",
 	})
-
 }

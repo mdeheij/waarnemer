@@ -1,6 +1,5 @@
 package services
 
-//import "os"
 import (
 	"bytes"
 	"github.com/mdeheij/monitoring/configuration"
@@ -13,15 +12,14 @@ import (
 
 //CheckService accepts a command and returns a status code, output (stdout) and the reaction time
 func CheckService(command string) (status int, output string, rtime int64) {
+	// Initialization.
 	now := time.Now()
-	timeStampHuman := now.Format(time.Stamp)
-	//status, outputMsg := execute(executable, args)
 	path := "checks/"
 	testArgs := make([]string, 1)
 	testArgs[0] = configuration.Config.BaseFolder + path + command
-
 	wrapperLocation := configuration.Config.BaseFolder + path + "wrapper"
-	//DebugMessage("WrapperLocation: " + wrapperLocation)
+
+	// Execute check service.
 	status, outputMsg := execute(wrapperLocation, testArgs)
 
 	elapsedTime := time.Since(now)
@@ -34,7 +32,8 @@ func CheckService(command string) (status int, output string, rtime int64) {
 		symbol = StatusColor("●", 0)
 	}
 
-	DebugMessage(symbol + " [" + timeStampHuman + "] {" + elapsedTime.String() + "} (" + strconv.Itoa(status) + ") - " + command + " -" + outputMsg)
+	DebugMessage(symbol + " [" + now.Format(time.Stamp) + "] {" + elapsedTime.String() + "} (" + strconv.Itoa(status) + ") - " + command + " -" + outputMsg)
+
 	return status, outputMsg, elapsedTimeHuman
 }
 
@@ -53,6 +52,7 @@ func execute(cmdName string, cmdArgs []string) (status int, output string) {
 		if err != nil {
 			fail = true
 		}
+
 		if exitError, ok := err.(*exec.ExitError); ok {
 			waitStatus = exitError.Sys().(syscall.WaitStatus)
 		}
