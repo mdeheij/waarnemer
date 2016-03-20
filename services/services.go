@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/mdeheij/monitoring/configuration"
 	"io/ioutil"
@@ -11,24 +10,23 @@ import (
 	"time"
 )
 
-var garbage string
-
-//Services map containing all the services
+// Services map containing all the services
 var Services = NewCMap()
 
-//DaemonActive are we currently checking services?
+// DaemonActive indicates whether or not there are checking services active.
 var DaemonActive = false
 
-//DebugMode: verbose output
+// DebugMode whether or not to show verbose output.
 var DebugMode = false
 
-//SilenceAll TODO: implement this
+// SilenceAll whether or not to TODO: implement this.
 var SilenceAll = false
 
-//Service struct containing a checks parameters
+var garbage string
+
+// Service describes all information that is required for a check.
 type Service struct {
 	Identifier       string       `json:"identifier"`
-	Description      string       `json:"description"`
 	Enabled          bool         `json:"enabled"`
 	Acknowledged     bool         `json:"acknowledged"`
 	Host             string       `json:"host"`
@@ -40,67 +38,52 @@ type Service struct {
 	ThresholdCounter int
 	Health           int
 	LastCheck        time.Time
-	IsLocked         bool
+	Lock             bool
 	RTime            int64
 	Output           string
 }
 
-//Enable a service
-func (service *Service) Enable() {
+// Enable enables a service.
+func (service Service) Enable() {
 	service.Enabled = true
-	Services.Set(service.Identifier, *service)
+	Services.Set(service.Identifier, service)
 }
 
-//Disable a service
-func (service *Service) Disable() {
+// Disable disables a service.
+func (service Service) Disable() {
 	service.Enabled = false
-	service.Health = -1 //health is not important because it is disabled now
-	Services.Set(service.Identifier, *service)
+	Services.Set(service.Identifier, service)
 }
 
-//Lock a service
-func (service *Service) Lock() {
-	service.IsLocked = true
-}
-
-//Unlock a service
-func (service *Service) Unlock() {
-	service.IsLocked = false
-}
-
-//Reschedule Set last check date so early that it has to be rechecked ASAP
-func (service *Service) Reschedule() {
+// Reschedule sets the last check date so early that it has to be checked again.
+func (service Service) Reschedule() {
+	// TODO: verify whether or not spaces matter in a UNIX date.
 	service.LastCheck, _ = time.Parse(time.UnixDate, "Sat Mar  7 11:06:39.1234 PST 1990")
-	Services.Set(service.Identifier, *service)
+	Services.Set(service.Identifier, service)
 }
 
-//EnableDebug Set debugmode to true
+// EnableDebug sets debugmode to true
 func EnableDebug() {
 	DebugMode = true
 }
 
-//DebugMessage prints text when debugmode is true
+// DebugMessage prints text when DebugMode is true.
 func DebugMessage(text interface{}) {
 	if DebugMode {
 		fmt.Println(text)
 	}
 }
 
-func GetPublicServices(group string) {
-
-}
-
-//UpdateList compare current map with fresh JSON getServices() and update values
+// UpdateList compares the current map with fresh JSON getServices() and updates values.
 func UpdateList() {
 	//Do not start a new check while updating
 	jsonServices := getServices() //[]Service
 	jsonServicesMap := NewCMap()  //Concurrent string-Service map
 
 	for _, newService := range jsonServices {
-		//oldService := Services[newService.Identifier]
 		oldService, _ := Services.Get(newService.Identifier)
 
-		newService.IsLocked = oldService.IsLocked
+		newService.Lock = oldService.Lock
 		newService.LastCheck = oldService.LastCheck
 		newService.Health = oldService.Health
 		newService.ThresholdCounter = oldService.ThresholdCounter
@@ -112,51 +95,34 @@ func UpdateList() {
 	}
 
 	Services = jsonServicesMap
-
 }
 
-//Update a service from fresh getServices()
+// Update updates a service from fresh getServices().
 func (service Service) Update() string {
-	//Do not start a new check while updating
-	service.Lock()
+	// Do not start a new check while updating.
+	service.Lock = true
+
 	for _, newService := range getServices() {
 		if newService.Identifier == service.Identifier {
+			// Copy in-memory attributes of service to new service.
+			newService.LastCheck = service.LastCheck
+			newService.Health = service.Health
+			newService.ThresholdCounter = service.ThresholdCounter
+			newService.Output = service.Output
+			newService.RTime = service.RTime
 
-			newService.copyMemoryAttributes(&service)
-			//push new service to Services map
-			fmt.Println("Setting service -> ", service.Identifier, newService)
+			// Push new service to `Services` map.
+			fmt.Println("Setting service :112 -> ", service.Identifier, newService)
 			Services.Set(service.Identifier, newService)
 
 			return "(!!) Reloaded " + service.Identifier + " from " + newService.Identifier
 		}
 	}
+
 	return "ERROR: SERVICE NOT FOUND"
 }
 
-//reloadServiceCopy: copies in-memory attributes of service to new service
-func (new Service) copyMemoryAttributes(original *Service) {
-
-	new.Lock()
-	//Copy in-memory attributes of service to new service
-	new.LastCheck = original.LastCheck
-	new.Health = original.Health
-	new.ThresholdCounter = original.ThresholdCounter
-	new.Output = original.Output
-	new.RTime = original.RTime
-
-	new.Unlock()
-
-}
-
-func (service Service) getJSON() string {
-	b, err := json.Marshal(service)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
-
-//StatusColor generates a command line colour based on health
+// StatusColor generates a command line colour based on health.
 func StatusColor(text string, health int) string {
 
 	switch health {
@@ -171,20 +137,58 @@ func StatusColor(text string, health int) string {
 	}
 }
 
-func (service Service) spawnChild() int {
+// Init intializes the service module.
+func Init() {
+	reloadServices()
+	go checkDispatcher()
+}
 
+// Start starts daemon checking.
+func Start() {
+	DebugMessage("Starting...")
+	DaemonActive = true
+
+	if DebugMode {
+		a := NewAction(Service{Host: configuration.Config.Hostname, Identifier: "monitoring.daemon", Threshold: 3, Health: 1, Output: "Monitoring started!", Action: ActionConfig{Name: "telegram", Telegramtarget: []int32{configuration.Config.TelegramNotificationTarget}}})
+
+		a.Run()
+	}
+}
+
+//Stop stops the daemon from checking.
+func Stop() {
+	DebugMessage("Stopping...")
+	DaemonActive = false
+
+	a := NewAction(Service{})
+	a.Run()
+}
+
+func (service Service) getJSON() string {
+	b, err := json.Marshal(service)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
+
+//TestConfiguration checks if configuration can be loaded and shows amount of services
+func TestConfiguration() {
+	fmt.Println("Length:", len(getServices()), "services")
+}
+
+func (service Service) spawnChild() int {
 	args := service.Command
 	args = strings.Replace(args, "$HOST$", service.Host, -1)
 	args = strings.Replace(args, "$TIMEOUT$", strconv.Itoa(service.Timeout), -1)
 
-	//DebugMessage("::::SpawnChild::Checking for " + service.Identifier + " - " + args)
 	status, output, rtime := CheckService(args)
 	service.Output = output
 
 	if status > 0 { //It's going down
 		oldHealth := service.Health
-		//service.Health = 2
-		//service.Comment = "Output: " + output
 		service.ThresholdCounter++
 
 		if oldHealth == -1 { //cold check, now its down
@@ -209,7 +213,7 @@ func (service Service) spawnChild() int {
 		}
 	}
 
-	service.Unlock()
+	service.Lock = false
 	service.RTime = rtime
 	service.LastCheck = time.Now()
 	Services.Set(service.Identifier, service)
@@ -224,7 +228,6 @@ func checkError(e error) {
 }
 
 func checkDispatcher() {
-
 	for {
 		if DaemonActive == true {
 			for item := range Services.IterBuffered() {
@@ -237,9 +240,9 @@ func checkDispatcher() {
 				//	DebugMessage(diff)
 
 				if service.Enabled {
-					if diff > service.Interval && service.IsLocked == false {
+					if diff > service.Interval && service.Lock == false {
 						//lock current check
-						service.Lock()
+						service.Lock = true
 
 						//update status in map
 						//Services[key] = service
@@ -264,33 +267,28 @@ func checkDispatcher() {
 			time.Sleep(time.Second)
 			//DebugMessage("Next run in " + strconv.Itoa(3-i) + "..")
 		}
-
 	}
 }
 
-//Init service module
-func Init() {
-	reloadServices()
-	go checkDispatcher()
-}
+func getServices() []Service {
+	raw, err := ioutil.ReadFile(configuration.Config.BaseFolder + "services.json")
 
-//Start daemon's checking
-func Start() {
-	DebugMessage("Starting..")
-	DaemonActive = true
-
-	if DebugMode == true {
-		a := NewAction(Service{Host: configuration.Config.Hostname, Identifier: "monitoring.daemon", Threshold: 3, Health: 1, Output: "Monitoring started!", Action: ActionConfig{Name: "telegram", Telegramtarget: []string{configuration.Config.TelegramNotificationTarget}}})
-		a.Run()
+	if err != nil {
+		DebugMessage("Cannot read file!")
+		panic(err)
+	} else {
+		DebugMessage(string(raw))
 	}
-}
 
-//Stop daemon from checking
-func Stop() {
-	DebugMessage("Stopping..")
-	DaemonActive = false
-	a := NewAction(Service{})
-	a.Run()
+	var s []Service
+	errUnmarshal := json.Unmarshal(raw, &s)
+
+	if errUnmarshal != nil {
+		DebugMessage("Cannot parse JSON file!")
+		panic(err)
+	}
+
+	return s
 }
 
 func reloadServices() {
@@ -302,39 +300,8 @@ func reloadServices() {
 	for _, service := range getServices() {
 		service.Health = -1 //you know nothing, monitoring
 		Services.Set(service.Identifier, service)
-		//DebugMessage("Loaded " + service.Identifier)
+		DebugMessage("Loaded " + service.Identifier)
+
 		count++
 	}
-}
-
-//TestConfiguration checks if configuration can be loaded and shows amount of services
-func TestConfiguration() error {
-	services := getServices()
-	length := len(services)
-	fmt.Println("Length:", length, "services")
-	if length > 0 {
-		return nil
-	} else {
-		return errors.New("Amount of services is invalid.")
-	}
-}
-
-func getServices() []Service {
-	raw, err := ioutil.ReadFile(configuration.Config.BaseFolder + "services.json")
-	if err != nil {
-		DebugMessage("Cannot read file!")
-		panic(err)
-	} else {
-		DebugMessage("Loaded services.")
-	}
-
-	var s []Service
-	errUnmarshal := json.Unmarshal(raw, &s)
-	if errUnmarshal != nil {
-		fmt.Println("Cannot parse JSON file! Please check the following:")
-		fmt.Println(" - Telegram targets are now strings! If you have custom targets set, make sure they are formatted as a string")
-
-		panic(err)
-	}
-	return s
 }

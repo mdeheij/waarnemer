@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -11,25 +10,17 @@ import (
 	"strings"
 )
 
-func getLoginUsername(c *gin.Context) string {
-	session := sessions.Default(c)
-	username := session.Get("username")
-	if username != nil {
-		return strings.ToLower(username.(string))
-	}
-	return ""
-}
+// CsrfOptions stores the options to use for CSRF protection.
+var CsrfOptions csrf.Options
 
-//AuthRequired is authentication middleware for user
+//AuthRequired is authentication middleware for user authenticaton.
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user, err := getUserByUsername(getLoginUsername(c))
-		if err != nil {
-			fmt.Println(err)
-		}
+		username := getLoginUsername(c)
 
-		if len(user.Username) > 0 { //TODO fix this once again
-			//c.Next()
+		_, err := getUserByUsername(username)
+
+		if err == nil {
 			c.Next()
 		} else {
 			c.Redirect(302, "/login?pleaseloginfirst")
@@ -38,10 +29,49 @@ func AuthRequired() gin.HandlerFunc {
 	}
 }
 
-var CsrfOptions csrf.Options
+// HashPassword hashes the provided password.
+// The hashing uses bcrypt with a default cost of 10.
+func HashPassword(password string) string {
+	// Hashing the password with the default cost of 10
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(hashedPassword)
+}
+
+// CheckPassword compares whether or not the provided password matches the saved password hash for the provided username.
+func CheckPassword(username string, password string) bool {
+	user, err := getUserByUsername(username)
+
+	if err == nil {
+		compareErr := bcrypt.CompareHashAndPassword([]byte(user.Hash), []byte(password))
+
+		if err != nil {
+			fmt.Println(compareErr)
+			return false
+		}
+
+		return true
+	}
+
+	fmt.Println(err)
+	return false
+}
+
+func getLoginUsername(c *gin.Context) string {
+	session := sessions.Default(c)
+	username := session.Get("username")
+
+	if username != nil {
+		return strings.ToLower(username.(string))
+	}
+
+	return ""
+}
 
 func loginInit(r *gin.Engine) {
-
 	CsrfOptions = csrf.Options{
 		Secret: configuration.Config.SecureCookie,
 		ErrorFunc: func(c *gin.Context) {
@@ -52,11 +82,10 @@ func loginInit(r *gin.Engine) {
 
 	store := sessions.NewCookieStore([]byte(configuration.Config.SecureCookie))
 	store.Options(configuration.Config.CookieConfig)
-	r.Use(sessions.Sessions(configuration.Config.SecureCookieName, store))
 
+	r.Use(sessions.Sessions(configuration.Config.SecureCookieName, store))
 	r.Use(csrf.Middleware(CsrfOptions))
 
-	//group := r.Group("/login")
 	group := r.Group("/login")
 	{
 		group.GET("/", loginPage)
@@ -65,10 +94,6 @@ func loginInit(r *gin.Engine) {
 		group.POST("/", func(c *gin.Context) {
 			username := strings.ToLower(c.PostForm("username"))
 			password := c.PostForm("password")
-
-			//hasher := sha1.New()
-			//hasher.Write(password)
-			//sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 
 			if CheckPassword(username, password) {
 				session := sessions.Default(c)
@@ -79,53 +104,28 @@ func loginInit(r *gin.Engine) {
 				c.Redirect(302, "/")
 			} else {
 				fmt.Println("Invalid credentials!")
-				fmt.Println("If this is a new password, please set the following hash:", GenerateFromPassword(password))
+				fmt.Println("If this is a new password, please set the following hash:", HashPassword(password))
 				c.Redirect(302, "/login?invalidpassword")
 			}
-
 		})
 	}
 }
 
-func GenerateFromPassword(password string) string {
-	// Hashing the password with the default cost of 10
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	return string(hashedPassword)
-}
-
+// getUserByUsername returns the user details if the username matches with the known usernames.
+// An empty result and an error will be returned if the user is not found.
 func getUserByUsername(username string) (configuration.User, error) {
 	for _, v := range configuration.Config.Users {
 		if v.Username == username {
 			return v, nil
 		}
 	}
-	return configuration.User{}, errors.New("No user found in configuration.")
-}
 
-//CheckPassword compares input to saved hash of password
-func CheckPassword(username string, password string) bool {
-
-	user, err := getUserByUsername(username)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	hashedPassword := user.Hash
-	//TODO implement error handling
-
-	errCompare := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if errCompare == nil {
-		return true
-	}
-
-	return false
+	return configuration.User{}, fmt.Errorf("Cannot find user %s", username)
 }
 
 func loginPage(c *gin.Context) {
 	fmt.Println(getLoginUsername(c))
+
 	c.HTML(200, "login.tmpl", gin.H{
 		"user":     getLoginUsername(c),
 		"csrf":     csrf.GetToken(c),
@@ -141,6 +141,7 @@ func logout(c *gin.Context) {
 
 	c.Redirect(302, "/login?logout-succesful")
 }
+
 func getSession(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"username": getLoginUsername(c),
