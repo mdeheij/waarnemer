@@ -1,0 +1,14 @@
+#!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
+timeout=5
+
+while getopts ":u:H:t:e:" opt; do
+  case $opt in
+    u)     user=$OPTARG             ;;
+    H)     host=$OPTARG             ;;
+    t)     timeout=$OPTARG          ;;
+    e)     execute=$OPTARG          ;;
+  esac
+done
+
+ssh -o ConnectTimeout=$timeout -oBatchMode=yes -n "$user@$host" "$execute"
