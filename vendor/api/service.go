@@ -56,8 +56,8 @@ func servicesUpdate(c *gin.Context) {
 		//lastCheckOld = services.Services[identifier].LastCheck.String()
 		err := service.Update()
 		if err != nil {
-			result = "Could not update service ", identifier
-			log.Error(result)
+			result = "Could not update service."
+			log.Error(result, identifier)
 		}
 		lastCheckNew = service.LastCheck.String()
 	} else {
