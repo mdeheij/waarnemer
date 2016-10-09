@@ -8,5 +8,6 @@ install:
   - go get github.com/bartholdbos/golegram
   - go get golang.org/x/crypto/bcrypt
   - go get github.com/op/go-logging
+  - go get github.com/itsjamie/gin-cors
 notifications:
   email: true
