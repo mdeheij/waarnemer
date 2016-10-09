@@ -1,0 +1,23 @@
+#!/bin/bash
+
+while getopts ":H:t:" opt; do
+  case $opt in
+    H)     host=$OPTARG             ;;
+    t)     timeout=$OPTARG          ;;
+  esac
+done
+
+
+raw=$(timeout $timeout curl --write-out "%{http_code}\n" -m $timeout -L $host -s -I --output /dev/null)
+output=$(echo "$raw")
+
+
+
+if [[ $output == *"200"* ]]
+then
+  	echo "CRITICAL - 200 NOT OK"
+  	exit 2
+else
+	echo "OK - SERVICE UNAVAILABLE"
+	exit 0
+fi
