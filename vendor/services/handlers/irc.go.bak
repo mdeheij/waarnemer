@@ -1,0 +1,42 @@
+package handlers
+
+import (
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/log"
+	"github.com/thoj/go-ircevent"
+	"time"
+	//"strings"
+)
+
+var ircobj *irc.Connection
+var messages chan string
+
+func init() {
+	log.Error("INIT VAN IRC")
+	// go setup()
+}
+
+func setup() {
+	log.Error("Setup() _for_ started")
+	for configuration.IsLoaded {
+		log.Error("Setup() waiting 1000")
+		time.Sleep(1000 * time.Millisecond)
+	}
+
+	log.Error("Setup() proceed")
+	messages = make(chan string)
+
+	ircobj = irc.IRC("m", "t"+configuration.Config.IRC.Username) //Create new ircobj
+	//ircobj.Connect(configuration.Config.IRC.Server)                                    //Connect to server
+	ircobj.Connect("irc.gate.sh:6667") //Connect to server
+
+	//TODO: Needs to have for each to loop through channels from config
+	ircobj.Join("#monitoring")
+	ircobj.Privmsg("#monitoring", "Ready for reporting.")
+}
+
+//IRC sends an IRC message to one or more channels
+func IRC(message string) {
+	log.Notice("Reporting to IRC: #monitoring: " + message)
+	ircobj.Privmsg("#monitoring", message)
+}
