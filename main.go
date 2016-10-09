@@ -13,7 +13,7 @@ var debug bool
 var testConfig bool
 var apiEnabled bool
 var autoStart bool
-var noActionHandling string
+var noActionHandling bool
 var config string
 
 func init() {
