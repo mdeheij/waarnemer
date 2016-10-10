@@ -20,7 +20,7 @@ func CheckService(command string) (status int, output string, rtime int64) {
 	now := time.Now()
 
 	//Convert executable to Go's os/exec.Command
-	commandSlice := str.ToArgv(configuration.C.ChecksFolder + "/" + command)
+	commandSlice := str.ToArgv(configuration.C.Paths.Checks + "/" + command)
 	status, output = Execute(commandSlice[0], commandSlice[1:len(commandSlice)]...)
 
 	//TODO: implement error logging

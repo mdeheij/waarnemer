@@ -11,8 +11,8 @@ var bot *golegram.Bot
 
 func SetupTelegram() {
 	var err error
-	log.Error("Instance bot initialized! Using token:", configuration.C.TelegramBotToken)
-	bot, err = golegram.NewBot(configuration.C.TelegramBotToken)
+	log.Error("Instance bot initialized! Using token:", configuration.C.Actions.Telegram.Bot)
+	bot, err = golegram.NewBot(configuration.C.Actions.Telegram.Bot)
 	if err != nil {
 		log.Error("[Telegram] Init error")
 		log.Error(err)
@@ -47,7 +47,7 @@ func Telegram(targets []string, message string) {
 			}
 		} else {
 			//If not, then use default one
-			target := configuration.C.TelegramNotificationTarget
+			target := configuration.C.Actions.Telegram.Target
 			result, err := bot.SendMessage(target, message, true, "Markdown")
 			checkMessageError(result, err)
 		}

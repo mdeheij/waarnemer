@@ -311,7 +311,7 @@ func readServiceFiles(searchDir string) []Service {
 }
 
 func getServices() []Service {
-	services := readServiceFiles(configuration.C.ServicesFolder)
+	services := readServiceFiles(configuration.C.Paths.Services)
 	if len(services) < 1 {
 		log.Panic("No services found! This makes me useless! Panic!")
 	}
