@@ -46,7 +46,7 @@ func (a ActionHandler) buildMessage() (msg string) {
 
 //Run on ActionHandler will execute specified action for service when considered down.
 func (a ActionHandler) Run() {
-	if configuration.Config.NoActionHandling == false {
+	if configuration.C.NoActionHandling == false {
 		if a.service.Acknowledged != true {
 
 			switch a.service.Action.Name {

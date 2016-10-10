@@ -23,9 +23,8 @@ func init() {
 	flag.BoolVar(&apiEnabled, "api", true, "Enable Web API")
 	flag.BoolVar(&autoStart, "autostart", true, "Autostart service checking")
 	flag.BoolVar(&noActionHandling, "no-action-handling", false, "Do not do anything when services are down")
-	flag.StringVar(&config, "config", "/etc/monitoring/config.json", "Path to config file")
+	flag.StringVar(&config, "config", "/etc/monitoring/config.yaml", "Path to config file")
 	flag.Parse()
-	configuration.Init(config)
 }
 
 func main() {
@@ -42,7 +41,7 @@ func main() {
 	}
 
 	if noActionHandling {
-		configuration.Config.NoActionHandling = true
+		configuration.C.NoActionHandling = true
 	}
 
 	services.Init()

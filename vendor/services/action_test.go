@@ -27,8 +27,8 @@ func TestAction(t *testing.T) {
 		t.SkipNow()
 
 	} else {
-		configuration.Config.TelegramBotToken = token
-		configuration.Config.TelegramNotificationTarget = target
+		configuration.C.TelegramBotToken = token
+		configuration.C.TelegramNotificationTarget = target
 	}
 
 	tgSlice := []string{target}
