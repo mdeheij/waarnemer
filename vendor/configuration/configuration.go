@@ -19,14 +19,30 @@ var Debug bool
 
 //Configuration struct
 type Configuration struct {
-	Hostname                   string
-	ChecksFolder               string
-	ServicesFolder             string
-	ServerAddress              string
-	ServerPort                 int
-	TelegramBotToken           string
-	TelegramNotificationTarget string
-	NoActionHandling           bool
+	Hostname         string
+	Api              apiConfig
+	Paths            pathConfig
+	Actions          actionConfig
+	NoActionHandling bool
+}
+
+type apiConfig struct {
+	Address string
+	Port    int
+}
+
+type actionConfig struct {
+	Telegram telegramConfig
+}
+
+type pathConfig struct {
+	Checks   string
+	Services string
+}
+
+type telegramConfig struct {
+	Bot    string
+	Target string
 }
 
 //User struct used for login
@@ -59,7 +75,7 @@ func Init(configfile string) {
 	errUnmarshal := yaml.Unmarshal(configContent, &C)
 
 	if errUnmarshal != nil {
-		log.Panic("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
+		log.Error("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
 		panic(errUnmarshal.Error())
 	}
 
@@ -71,6 +87,6 @@ func Init(configfile string) {
 	}
 
 	IsLoaded = true
-	log.Notice("Services: ", C.ServicesFolder)
-	log.Notice("Checks: ", C.ChecksFolder)
+	log.Notice("Services: ", C.Paths.Services)
+	log.Notice("Checks: ", C.Paths.Checks)
 }

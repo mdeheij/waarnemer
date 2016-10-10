@@ -68,7 +68,8 @@ func Setup() {
 	}
 	log.Notice("Starting webserver")
 
-	r.Run("0.0.0.0:8080")
+	log.Info("API listening on http://" + configuration.C.Api.Address)
+	r.Run(configuration.C.Api.Address)
 }
 
 func check(e error) {
