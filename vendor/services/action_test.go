@@ -1,37 +1,20 @@
 package services
 
 import (
-	"flag"
 	"fmt"
 	"testing"
 
 	"configuration"
 )
 
-var target string
-var token string
-
-func init() {
-	flag.StringVar(&target, "target", "", "Telegram Target")
-	flag.StringVar(&token, "token", "", "Telegram Bot Token")
-	flag.Parse()
-
-}
-
 func TestAction(t *testing.T) {
 	//fmt.Println(ServicesConfig)
 	//fmt.Println("[Testing]")
 
-	if target == "" || token == "" {
-		fmt.Println("Token and/or target is not set! TEST WILL NOT RUN")
-		t.SkipNow()
+	t.SkipNow() //TODO: fix this test.
+	configuration.Init("config.yaml")
 
-	} else {
-		configuration.C.Actions.Telegram.Bot = token
-		configuration.C.Actions.Telegram.Target = target
-	}
-
-	tgSlice := []string{target}
+	tgSlice := []string{configuration.C.Actions.Telegram.Target}
 	ac := ActionConfig{Name: "telegram", Telegramtarget: tgSlice}
 	s := &Service{Host: "go test", Identifier: "TestAction", Threshold: 3, Health: 1, Output: "OK", Action: ac}
 
