@@ -1,12 +1,3 @@
-BRANCH
-init/monitoringclient
-agent/agent-tempfile
-logs/
-config.json
-services.json
+config.yaml
 monitoring
-client-daemon
-client-daemon/monitoringclientd
 nohup.out
-.archive/
-monctl/monctl
