@@ -1,17 +1,15 @@
 package configuration
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/gin-gonic/contrib/sessions"
+	yaml "gopkg.in/yaml.v2"
 )
 
 //Config instance of Configuration struct
-var Config Configuration
+var C Configuration
 
 //IsLoaded returns true when the configuration is loaded
 var IsLoaded bool
@@ -26,26 +24,15 @@ type Configuration struct {
 	ServicesFolder             string
 	ServerAddress              string
 	ServerPort                 int
-	Users                      []User
-	SecureCookieName           string
-	SecureCookie               string
-	TelegramBotToken           string `json:"TelegramBotToken"`
-	TelegramNotificationTarget string `json:"TelegramNotificationTarget"`
-	CookieConfig               sessions.Options
-	Public                     []PublicGroup
+	TelegramBotToken           string
+	TelegramNotificationTarget string
 	NoActionHandling           bool
 }
 
 //User struct used for login
 type User struct {
 	Username string
-	Hash     string
-}
-
-//PublicGroup struct used to define public available groups
-type PublicGroup struct {
-	Name     string
-	Services []string
+	Token    string
 }
 
 //Init ializes the configuration
@@ -58,7 +45,7 @@ func Init(configfile string) {
 	if err == nil {
 		configContent = tempContent
 	} else {
-		tempContent, err = ioutil.ReadFile("config.json")
+		tempContent, err = ioutil.ReadFile("config.yaml")
 		if err == nil {
 			configContent = tempContent
 		} else {
@@ -66,9 +53,13 @@ func Init(configfile string) {
 		}
 	}
 
-	errUnmarshal := json.Unmarshal(configContent, &Config)
+	m := Configuration{}
+	err = yaml.Unmarshal(configContent, &m)
+
+	errUnmarshal := yaml.Unmarshal(configContent, &C)
+
 	if errUnmarshal != nil {
-		fmt.Println("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
+		log.Panic("Cannot load configuration! Make sure the configuration file matches your version of monitoring.")
 		panic(errUnmarshal.Error())
 	}
 
@@ -76,10 +67,10 @@ func Init(configfile string) {
 	if err != nil {
 		panic(err)
 	} else {
-		Config.Hostname = name
+		C.Hostname = name
 	}
 
 	IsLoaded = true
-	log.Notice("Services: ", Config.ServicesFolder)
-	log.Notice("Checks: ", Config.ChecksFolder)
+	log.Notice("Services: ", C.ServicesFolder)
+	log.Notice("Checks: ", C.ChecksFolder)
 }

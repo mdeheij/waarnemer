@@ -1,0 +1,633 @@
+[
+    {
+        "identifier": "mdeheij.randomserver1.diskspace",
+        "host": "randomserver1.example.com",
+        "description": "Willekeurige Test",
+        "command": "exit 0",
+        "timeout": 10,
+        "interval": 120,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": true,
+        "action": {
+            "name": "irc",
+            "telegramtarget": [
+                "@monitoringdeheijdev",
+                "-6294604"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random1",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": true,
+        "action": {
+            "name": "irc"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random2",
+        "host": "mydomain.nl",
+        "command": "sslcheck -H $HOST$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random3",
+        "host": "example.com",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random4",
+        "host": "dev",
+        "command": "ping -H 0.0.0.0 -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 3,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random5",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random6",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random26",
+        "description": "Willekeurige Test Random 26",
+        "host": "0.0.0.0",
+        "command": "sleep 10",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": true,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.rando1m216",
+        "host": "0.0.0.0",
+        "command": "exit 4",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random7",
+        "host": "0.0.0.0",
+        "command": "ping -H localhoost -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random8",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random9",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random10",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random111",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random1111",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random11112",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random1113",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.random11fdsf",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.randoasdasm11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.randsdfsdfom11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.randhhhhom11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.randosfsdfm11",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none"
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.net.ipv4.nl",
+        "host": "127.0.0.1",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 2,
+        "interval": 1,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.net.ipv4.lt",
+        "host": "0.0.0.0",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 2,
+        "interval": 1,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.net.ipv4.main",
+        "host": "8.8.8.8",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 2,
+        "interval": 1,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.minecraft",
+        "host": "nl.randomserver3.0.0.0.0",
+        "command": "telnet -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": false,
+        "acknowledged": true,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.cloud.assets",
+        "host": "https://assets.cloud.company.dev/",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 1,
+        "threshold": 5,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.mijn",
+        "host": "mijn.company.dev",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 4,
+        "interval": 1,
+        "threshold": 0,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.dev.emoji.test.blij",
+        "host": "https://www.company.dev/",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 7,
+        "interval": 1,
+        "threshold": 0,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc"
+        }
+    },
+    {
+        "identifier": "company.cp",
+        "host": "https://cp.company.dev/servlet/Turbine/frm/single/",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 37,
+        "threshold": 22,
+        "enabled": false,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.dns.ns2",
+        "host": "ns2.companybv.nl",
+        "command": "dnscheck -H company.dev -r 91.184.8.50 -n $HOST$",
+        "timeout": 3,
+        "interval": 1,
+        "threshold": 1,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.dns.ns3",
+        "host": "ns3.companybv.nl",
+        "command": "dnscheck -H company.dev -r 91.184.8.50 -n $HOST$",
+        "timeout": 3,
+        "interval": 1,
+        "threshold": 0,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "company.dns.ns1",
+        "host": "ns1.companybv.nl",
+        "command": "dnscheck -H company.dev -r 91.184.8.50 -n $HOST$",
+        "timeout": 3,
+        "interval": 1,
+        "threshold": 0,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.teamspeak",
+        "host": "butthurt.nl",
+        "command": "telnet -H butthurt.nl -t $TIMEOUT$ -p 10011",
+        "timeout": 5,
+        "interval": 1,
+        "threshold": 1,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.mysql.phpmyadmin",
+        "host": "https://0.0.0.0/dbmgr/index.php",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 1,
+        "threshold": 1,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.cloud",
+        "host": "http://example.com",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 10,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.catharinaschool",
+        "host": "https://catharina-school.nl/wp-admin/",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 6,
+        "interval": 1,
+        "threshold": 4,
+        "enabled": false,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.mysql.processlist",
+        "host": "https://catharina-school.nl/wp-admin/",
+        "command": "mysql-processlist -Hshared.0.0.0.0 -u monitoring -pMkGbnpkDR0tCBZe4aW6mjd0TZVHF9uwLpiku",
+        "timeout": 6,
+        "interval": 1,
+        "threshold": 1,
+        "enabled": false,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.checks.test.switch",
+        "host": "http://42k.nl/s/switch/",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 3,
+        "threshold": 12,
+        "enabled": false,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev",
+                "-6294604"
+            ]
+        }
+    },
+    {
+        "identifier": "mdeheij.randomserver3.checks.test.random",
+        "host": "0.0.0.0",
+        "command": "telnet -H $HOST$ -t $TIMEOUT$ -p 6473",
+        "timeout": 2,
+        "interval": 1,
+        "threshold": 22,
+        "enabled": false,
+        "acknowledged": false,
+        "action": {
+            "name": "none",
+            "telegramtarget": [
+                "@monitoringdeheijdev"
+            ]
+        }
+    },
+    {
+        "identifier": "github.web",
+        "host": "localhost",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 15,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc"
+        }
+    },
+    {
+        "identifier": "github.web2",
+        "description": "Github Website 2nd",
+        "host": "localhost",
+        "command": "ping -H $HOST$ -t $TIMEOUT$",
+        "timeout": 5,
+        "interval": 15,
+        "threshold": 3,
+        "enabled": true,
+        "acknowledged": false,
+        "action": {
+            "name": "irc"
+        }
+    }
+]

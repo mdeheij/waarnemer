@@ -24,7 +24,6 @@ func AuthRequired() gin.HandlerFunc {
 }
 
 func main() {
-	configuration.Init("../config.json") //TODO: fix this
 	Setup()
 }
 
