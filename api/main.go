@@ -6,7 +6,11 @@ import (
 	gin "github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
 	log "github.com/mdeheij/logwrap"
+	"github.com/mdeheij/monitoring/api/pages"
+	"github.com/mdeheij/monitoring/api/services"
+	"github.com/mdeheij/monitoring/api/system"
 	configuration "github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/system/status"
 )
 
 //AuthRequired is authentication middleware for user authenticaton.
@@ -36,7 +40,6 @@ func Setup() {
 	}
 
 	r := gin.New()
-	// If configuration values are empty, Gin will listen and serve on 0.0.0.0:8080.
 
 	r.Use(cors.Middleware(cors.Config{
 		Origins:         "*",
@@ -48,30 +51,28 @@ func Setup() {
 		ValidateHeaders: false,
 	}))
 
-	servicesGroup := r.Group("/api/service/", AuthRequired())
+	r.SetHTMLTemplate(pages.Template)
+	r.GET("/", pages.Routes)
+
+	serviceGroup := r.Group("/api/", AuthRequired())
 	{
-		servicesGroup.GET("/start", servicesStart)
-		servicesGroup.GET("/stop", servicesStop)
-		servicesGroup.GET("/updatelist", servicesUpdateList)
-		servicesGroup.GET("/update/:identifier", servicesUpdate)
-		servicesGroup.GET("/reschedule/:identifier", servicesRescheduleCheck)
-		servicesGroup.GET("/list", servicesGetServicesAsJSON)
-		servicesGroup.GET("/list/:identifier", servicesGetServicesWithIdentifier)
-		servicesGroup.OPTIONS("/list", servicesGetServicesAsJSON) //TODO: is this used, and if so, refactor
+		serviceGroup.GET("/services/:identifier/update", services.Update)
+		serviceGroup.GET("/services/:identifier/reschedule", services.Reschedule)
+		serviceGroup.GET("/services/:identifier", services.Show)
+		serviceGroup.GET("/services", services.List)
 	}
 
-	publicGroup := r.Group("/public")
+	systemAPI := r.Group("/api/system/", AuthRequired())
 	{
-		publicGroup.GET("/status/:group", servicesGetPublicServices)
+		systemAPI.GET("/start", system.Start)
+		systemAPI.GET("/stop", system.Stop)
+		systemAPI.GET("/reload", system.Reload)
 	}
-	log.Notice("Starting webserver")
 
+	log.Notice("Starting webserver..")
 	log.Info("API listening on http://" + configuration.C.API.Address)
-	r.Run(configuration.C.API.Address)
-}
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+	status.Api.Routes = r.Routes()
+
+	r.Run(configuration.C.API.Address)
 }
