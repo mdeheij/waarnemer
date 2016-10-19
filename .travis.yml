@@ -10,5 +10,6 @@ install:
   - go get github.com/op/go-logging
   - go get github.com/itsjamie/gin-cors
   - go get github.com/mgutz/str
+  - go get github.com/mdeheij/logwrap
 notifications:
   email: true
