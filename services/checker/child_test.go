@@ -3,9 +3,9 @@ package checker
 import "testing"
 
 func TestSomeCommands(t *testing.T) {
-	CommandExec(t, "rpe -u mdeheij -H wolkopslag.nl -e '/home/mdeheij/diskspace data'")
-	CommandExec(t, "rpe -u mdeheij -H wolkopslag.nl -e '/home/mdeheij/diskspace /'")
-	CommandExec(t, "curl -H http://google.nl -t 5")
+	CommandExec(t, "rpe -u root -H server.local -e '/etc/monitoring/diskspace data'")
+	CommandExec(t, "rpe -u root -H server.local -e '/etc/monitoring/diskspace /'")
+	CommandExec(t, "curl -H http://server.local -t 5")
 }
 
 func CommandExec(t *testing.T, cmd string) {
