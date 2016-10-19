@@ -17,6 +17,9 @@ var IsLoaded bool
 //Debug mode activated
 var Debug bool
 
+//AutoStart determines if daemon should be checking on startup
+var AutoStart bool
+
 //Configuration struct
 type Configuration struct {
 	Hostname         string
