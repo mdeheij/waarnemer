@@ -14,12 +14,12 @@ type PublicService struct {
 
 //servicesGetServicesEmbed returns the services as a nice embed for Grafana
 func servicesGetPublicServices(c *gin.Context) {
-	group := c.Param("group")
+	// group := c.Param("group")
 
 	//test, _ := services.Services.Get("company.dns.ns1")
 
 	c.JSON(200, gin.H{
-		"daemon":   services.DaemonActive,
-		"services": getPublicServices(group),
+		"daemon": services.DaemonActive,
+		// "services": getPublicServices(group),
 	})
 }
