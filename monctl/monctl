@@ -1,21 +1,39 @@
 #!/bin/bash
-API_URL=""
-TOKEN=5
+API_URL="http://[::1]:4200"
+TOKEN=$MONITORING_CLIENT_TOKEN
+
+function apiCall {
+    URL="$API_URL/api/$1"
+    echo "$URL"
+    curl -s -H "Authorization: Bearer $TOKEN" "$URL"
+    echo ""
+}
 
 case "$1" in
 
 "start")  echo "Starting Monitoring service checking."
-    echo TODO $2
+    apiCall "service/start"
     ;;
 "stop")  echo  "Stopping Monitoring service checking."
-    echo TODO $2
+    apiCall "service/stop"
     ;;
 "reload")  echo  "Reloading services."
-    echo TODO $2
+    apiCall "service/reload"
     ;;
-"list") echo  "Listing services."
-    echo TODO
+"list")
+    echo -e "HEALTH\tACTION_NAME\tIDENTIFIER"
+    echo ""
+    # apiCall "service/list" | jq -r `.[] | "\(.Health)\t\(.identifier) $TOKEN:: \(.command)"`
+    apiCall "service/list" | jq -r '.[] | "\(.Health)\t\(.action.Name)\t\(.identifier)"'
    ;;
-*) echo "Command $1 is not processed"
+*) echo -e "Usage: monctl [OPTION]...
+
+Control Monitoring by API using monctl
+
+  start\t\t Start Monitoring service checking
+  stop\t\t Stop Monitoring service checking
+  reload\t Reload all Monitoring services
+  list\t\t List all Monitoring services
+  "
    ;;
 esac

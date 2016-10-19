@@ -12,19 +12,18 @@ import (
 //AuthRequired is authentication middleware for user authenticaton.
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var err error
-		if err == nil {
-			c.Header("Content-Type", "application/json; charset=utf8") //TODO: This should be a seperate middleware
-			c.Next()
-		} else {
-			c.String(401, "Unauthorized.")
-			c.Abort()
+		for _, value := range configuration.C.UserTokens {
+			if ("Bearer " + value) == c.Request.Header.Get("Authorization") {
+				c.Header("Content-Type", "application/json; charset=utf8") //TODO: This should be a seperate middleware
+				c.Next()
+				return
+			}
 		}
-	}
-}
 
-func main() {
-	Setup()
+		log.Warning(c.ClientIP(), "No authorization header match.")
+		c.String(401, "Unauthorized.")
+		c.Abort()
+	}
 }
 
 //Setup initializes routers, login and services.
@@ -51,15 +50,14 @@ func Setup() {
 
 	servicesGroup := r.Group("/api/service/", AuthRequired())
 	{
-		// monitoringGroup.GET("/", servicesPage)
-		servicesGroup.POST("/start", servicesStart)
-		servicesGroup.POST("/stop", servicesStop)
-		servicesGroup.POST("/updatelist", servicesUpdateList)
-		servicesGroup.POST("/update/:identifier", servicesUpdate)
-		servicesGroup.POST("/reschedule/:identifier", servicesRescheduleCheck)
-		servicesGroup.OPTIONS("/list", servicesGetServicesAsJSON)
+		servicesGroup.GET("/start", servicesStart)
+		servicesGroup.GET("/stop", servicesStop)
+		servicesGroup.GET("/updatelist", servicesUpdateList)
+		servicesGroup.GET("/update/:identifier", servicesUpdate)
+		servicesGroup.GET("/reschedule/:identifier", servicesRescheduleCheck)
 		servicesGroup.GET("/list", servicesGetServicesAsJSON)
 		servicesGroup.GET("/list/:identifier", servicesGetServicesWithIdentifier)
+		servicesGroup.OPTIONS("/list", servicesGetServicesAsJSON) //TODO: is this used, and if so, refactor
 	}
 
 	publicGroup := r.Group("/public")
@@ -68,8 +66,8 @@ func Setup() {
 	}
 	log.Notice("Starting webserver")
 
-	log.Info("API listening on http://" + configuration.C.Api.Address)
-	r.Run(configuration.C.Api.Address)
+	log.Info("API listening on http://" + configuration.C.API.Address)
+	r.Run(configuration.C.API.Address)
 }
 
 func check(e error) {

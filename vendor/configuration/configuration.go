@@ -20,9 +20,10 @@ var Debug bool
 //Configuration struct
 type Configuration struct {
 	Hostname         string
-	Api              apiConfig
+	API              apiConfig
 	Paths            pathConfig
 	Actions          actionConfig
+	UserTokens       []string
 	NoActionHandling bool
 }
 
@@ -43,12 +44,6 @@ type pathConfig struct {
 type telegramConfig struct {
 	Bot    string
 	Target string
-}
-
-//User struct used for login
-type User struct {
-	Username string
-	Token    string
 }
 
 //Init ializes the configuration
