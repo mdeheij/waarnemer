@@ -1,12 +1,12 @@
 package api
 
 import (
-	"configuration"
 	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
+	"github.com/mdeheij/monitoring/configuration"
 )
 
 //AuthRequired is authentication middleware for user authenticaton.

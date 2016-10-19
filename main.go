@@ -1,12 +1,13 @@
 package main
 
 import (
-	"api"
-	"configuration"
 	"flag"
 	"log"
 	"os"
-	"services"
+
+	"github.com/mdeheij/monitoring/api"
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/services"
 )
 
 var debug bool

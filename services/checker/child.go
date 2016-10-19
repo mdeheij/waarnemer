@@ -2,15 +2,15 @@ package checker
 
 import (
 	"bytes"
-	"configuration"
 	"log"
-	"message"
 	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/message"
 	"github.com/mgutz/str"
 )
 

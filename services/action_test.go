@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"configuration"
+	"github.com/mdeheij/monitoring/configuration"
 )
 
 func TestAction(t *testing.T) {

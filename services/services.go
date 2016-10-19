@@ -1,18 +1,18 @@
 package services
 
 import (
-	"configuration"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"services/checker"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/services/checker"
 	yaml "gopkg.in/yaml.v2"
 )
 

@@ -1,13 +1,6 @@
 package checker
 
-import
-//"flag"
-//	"fmt"
-//"github.com/davecgh/go-spew/spew"
-//"github.com/mdeheij/monitoring/configuration"
-"testing"
-
-//"time"
+import "testing"
 
 func TestSomeCommands(t *testing.T) {
 	CommandExec(t, "rpe -u mdeheij -H wolkopslag.nl -e '/home/mdeheij/diskspace data'")

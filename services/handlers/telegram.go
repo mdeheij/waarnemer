@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"configuration"
 	"log"
 
 	"github.com/bartholdbos/golegram"
+	"github.com/mdeheij/monitoring/configuration"
 )
 
 var bot *golegram.Bot

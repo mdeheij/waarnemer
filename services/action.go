@@ -1,11 +1,12 @@
 package services
 
 import (
-	"configuration"
 	"fmt"
 	"log"
-	"services/handlers"
 	"strconv"
+
+	"github.com/mdeheij/monitoring/configuration"
+	"github.com/mdeheij/monitoring/services/handlers"
 )
 
 //ActionConfig is defined in a service to be handled when considered down.
@@ -52,8 +53,6 @@ func (a ActionHandler) Run() {
 			switch a.service.Action.Name {
 			case "telegram":
 				handlers.Telegram(a.service.Action.Telegramtarget, a.buildMessage())
-			case "rpe":
-				handlers.RemotePluginExecutor(a.service.Host)
 			case "none":
 				log.Notice("Skipping action for ", a.service.Identifier)
 			default:

@@ -3,15 +3,12 @@ package api
 import (
 	"encoding/json"
 	"log"
-	"services"
 	"strings"
+
+	"github.com/mdeheij/monitoring/services"
 
 	"github.com/gin-gonic/gin"
 )
-
-func servicesInit(r *gin.Engine) {
-
-}
 
 func servicesStart(c *gin.Context) {
 	services.Start()
@@ -53,12 +50,13 @@ func servicesUpdate(c *gin.Context) {
 	if identifier != "" {
 		service, _ := services.Services.Get(identifier)
 		lastCheckOld = service.LastCheck.String()
-		//lastCheckOld = services.Services[identifier].LastCheck.String()
+
 		err := service.Update()
 		if err != nil {
 			result = "Could not update service."
 			log.Error(result, identifier)
 		}
+
 		lastCheckNew = service.LastCheck.String()
 	} else {
 		result = "No parameter to update!"
