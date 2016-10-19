@@ -52,7 +52,7 @@ func Setup() {
 	}))
 
 	r.SetHTMLTemplate(pages.Template)
-	r.GET("/", pages.Routes)
+	r.GET("/", pages.Homepage)
 
 	serviceGroup := r.Group("/api/", AuthRequired())
 	{
