@@ -2,12 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 
-	"github.com/mdeheij/monitoring/services"
-
 	"github.com/gin-gonic/gin"
+	log "github.com/mdeheij/logwrap"
+	"github.com/mdeheij/monitoring/services"
 )
 
 func servicesStart(c *gin.Context) {

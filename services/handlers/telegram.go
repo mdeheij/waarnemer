@@ -1,9 +1,8 @@
 package handlers
 
 import (
-	"log"
-
 	"github.com/bartholdbos/golegram"
+	log "github.com/mdeheij/logwrap"
 	"github.com/mdeheij/monitoring/configuration"
 )
 

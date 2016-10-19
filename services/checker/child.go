@@ -2,13 +2,13 @@ package checker
 
 import (
 	"bytes"
-	"log"
 	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	log "github.com/mdeheij/logwrap"
 	"github.com/mdeheij/monitoring/configuration"
 	"github.com/mdeheij/monitoring/message"
 	"github.com/mgutz/str"

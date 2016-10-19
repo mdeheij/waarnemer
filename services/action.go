@@ -2,9 +2,9 @@ package services
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
+	log "github.com/mdeheij/logwrap"
 	"github.com/mdeheij/monitoring/configuration"
 	"github.com/mdeheij/monitoring/services/handlers"
 )

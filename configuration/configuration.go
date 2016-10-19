@@ -2,9 +2,9 @@ package configuration
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 
+	log "github.com/mdeheij/logwrap"
 	yaml "gopkg.in/yaml.v2"
 )
 

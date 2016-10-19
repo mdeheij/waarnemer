@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 
+	log "github.com/mdeheij/logwrap"
 	"github.com/mdeheij/monitoring/api"
 	"github.com/mdeheij/monitoring/configuration"
 	"github.com/mdeheij/monitoring/services"
