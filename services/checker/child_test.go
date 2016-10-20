@@ -9,5 +9,5 @@ func TestSomeCommands(t *testing.T) {
 }
 
 func CommandExec(t *testing.T, cmd string) {
-	CheckService(cmd)
+	CheckService(5, cmd)
 }

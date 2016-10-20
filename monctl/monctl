@@ -1,5 +1,5 @@
 #!/bin/bash
-API_URL="http://[::1]:4200"
+API_URL="http://localhost:4200"
 TOKEN=$MONITORING_CLIENT_TOKEN
 
 function apiCall {
@@ -12,13 +12,13 @@ function apiCall {
 case "$1" in
 
 "start")  echo "Starting Monitoring service checking."
-    apiCall "service/start"
+    apiCall "system/start"
     ;;
 "stop")  echo  "Stopping Monitoring service checking."
-    apiCall "service/stop"
+    apiCall "system/stop"
     ;;
 "reload")  echo  "Reloading services."
-    apiCall "service/reload"
+    apiCall "system/reload"
     ;;
 "list")
     echo -e "HEALTH\tACTION_NAME\tIDENTIFIER"

@@ -15,7 +15,7 @@ func SpawnCheck(service *model.Service) int {
 	args = strings.Replace(args, "$HOST$", service.Host, -1)
 	args = strings.Replace(args, "$TIMEOUT$", strconv.Itoa(service.Timeout), -1)
 
-	status, output, rtime := CheckService(args)
+	status, output, rtime := CheckService(service.Timeout, args)
 	service.Output = output
 
 	if status > 0 { //It's going down
