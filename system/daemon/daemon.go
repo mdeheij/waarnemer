@@ -5,6 +5,7 @@ import (
 
 	log "github.com/mdeheij/logwrap"
 	"github.com/mdeheij/monitoring/services"
+	"github.com/mdeheij/monitoring/services/checker"
 	"github.com/mdeheij/monitoring/services/model"
 )
 
@@ -55,7 +56,7 @@ func checkDispatcher() {
 						model.Services.Set(key, service)
 
 						//spawn check for service
-						go service.SpawnCheck()
+						go checker.SpawnCheck(&service)
 					}
 				}
 			}
