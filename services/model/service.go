@@ -69,7 +69,7 @@ func (service *Service) Reschedule() {
 }
 
 //CopyMemoryAttributes copies in-memory attributes of a service to a new service
-func (new Service) CopyMemoryAttributes(original *Service) { //TODO: rename this
+func (new Service) CopyAttributes(original *Service) { //TODO: rename this
 	new.Claim()
 
 	new.LastCheck = original.LastCheck

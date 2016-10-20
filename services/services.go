@@ -30,7 +30,7 @@ func UpdateService(old model.Service) error {
 	old.Claim()
 	for _, new := range loader.FindServices() {
 		if new.Identifier == old.Identifier {
-			new.CopyMemoryAttributes(&old)
+			new.CopyAttributes(&old)
 			//push new service to Services map
 			model.Services.Set(old.Identifier, new)
 
