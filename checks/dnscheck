@@ -10,16 +10,13 @@ while getopts ":H:t:r:n:" opt; do
   esac
 done
 
-
-
 digAnswer=$(timeout $timeout dig $host @$nameserver +short)
-  
 
 if [[ $digAnswer == *"$result"* ]]
 then
   	echo "OK - $digAnswer"
   	exit 0
-else 
+else
   	echo "CRITICAL - $digAnswer"
   	exit 2
 fi

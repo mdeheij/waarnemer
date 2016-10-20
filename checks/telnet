@@ -12,12 +12,11 @@ done
 raw=$(timeout $timeout echo exit | telnet $host $port)
 output=$(echo "$raw")
 
-
 if [[ $output == *Connected* ]]
 then
   echo "OK - Connected"
   exit 0
-else 
+else
   echo "CRITICAL - Not Connected: $output"
   exit 2
 fi

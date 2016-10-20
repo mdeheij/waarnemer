@@ -9,7 +9,6 @@ while getopts ":H:t:" opt; do
 done
 
 rawping=$(ping $host -c 1 -w $timeout -i 1)
-#echo "ping $host -c 1 -w $timeout -i 1"
 
 if [[ $rawping == *"1 received"* ]]
 then
@@ -19,8 +18,3 @@ else
 	echo "CRITICAL - $rawping"
 	exit 2
 fi
-
-
-# time=$(echo "$rawping" | tail -1| awk '{print $4}' | cut -d '/' -f 2)
-# echo "time=$time;"
-# #echo "error=PING FAILED;"

@@ -7,11 +7,8 @@ while getopts ":H:t:" opt; do
   esac
 done
 
-
 raw=$(timeout $timeout curl --write-out "%{http_code}\n" -m $timeout -L $host -s -I --output /dev/null)
 output=$(echo "$raw")
-
-
 
 if [[ $output == *"200"* ]]
 then
