@@ -1,5 +1,12 @@
 package message
 
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/mdeheij/monitoring/services/model/health"
+)
+
 //StatusColor generates a command line colour based on health
 func StatusColor(text string, health int) string {
 
@@ -15,4 +22,20 @@ func StatusColor(text string, health int) string {
 	default:
 		return "\x1b[31;1m" + text + "\x1b[0m"
 	}
+}
+
+func BuildNotificationMessage(identifier string, currentHealth int, host string, thresholdCounter int, threshold int, output string) (msg string) {
+	thresholdCounting := strconv.Itoa(thresholdCounter) + "/" + strconv.Itoa(threshold)
+	actionTypeString := ""
+
+	switch currentHealth {
+	case health.CRITICAL:
+		actionTypeString = "🔴"
+	case health.OK:
+		actionTypeString = "✅"
+	case health.WARNING:
+		actionTypeString = "⚠️"
+	}
+
+	return fmt.Sprintf("%s %s (%s) %s\n %s", actionTypeString, identifier, host, thresholdCounting, output)
 }
