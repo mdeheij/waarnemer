@@ -1,12 +1,12 @@
 package model
 
 import (
-	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/mdeheij/monitoring/services/checker"
+	"github.com/mdeheij/monitoring/services/model/health"
 )
 
 var garbage string
@@ -44,16 +44,16 @@ func (service *Service) Enable() {
 //Disable a service
 func (service *Service) Disable() {
 	service.Enabled = false
-	service.Health = -1 //health is not important because it is disabled now
+	service.Health = health.UNKNOWN //health is not important because it is disabled now
 	Services.Set(service.Identifier, *service)
 }
 
-//Lock a service
+//Claim a service while checking
 func (service *Service) Claim() {
 	service.Claimed = true
 }
 
-//Unlock a service
+//Release a service after checking
 func (service *Service) Release() {
 	service.Claimed = false
 }
@@ -64,15 +64,10 @@ func (service *Service) Reschedule() {
 	Services.Set(service.Identifier, *service)
 }
 
-func GetPublicServices(group string) {
-	//TODO: build this
-}
-
-//reloadServiceCopy: copies in-memory attributes of service to new service
+//CopyMemoryAttributes copies in-memory attributes of a service to a new service
 func (new Service) CopyMemoryAttributes(original *Service) { //TODO: rename this
-
 	new.Claim()
-	//Copy in-memory attributes of service to new service
+
 	new.LastCheck = original.LastCheck
 	new.Health = original.Health
 	new.ThresholdCounter = original.ThresholdCounter
@@ -80,15 +75,6 @@ func (new Service) CopyMemoryAttributes(original *Service) { //TODO: rename this
 	new.RTime = original.RTime
 
 	new.Release()
-
-}
-
-func (service Service) getJSON() string {
-	b, err := json.Marshal(service)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
 }
 
 func (service *Service) SpawnCheck() int {
@@ -97,33 +83,30 @@ func (service *Service) SpawnCheck() int {
 	args = strings.Replace(args, "$HOST$", service.Host, -1)
 	args = strings.Replace(args, "$TIMEOUT$", strconv.Itoa(service.Timeout), -1)
 
-	//log.Warning("::::SpawnChild::Checking for " + service.Identifier + " - " + args)
 	status, output, rtime := checker.CheckService(args)
 	service.Output = output
 
 	if status > 0 { //It's going down
 		oldHealth := service.Health
-		//service.Health = 2
-		//service.Comment = "Output: " + output
 		service.ThresholdCounter++
 
 		if oldHealth == -1 { //cold check, now its down
-			service.Health = 1 //set warning state
+			service.Health = health.WARNING //set warning state
 		}
 
 		if oldHealth == 0 {
-			service.Health = 1 //(re)set warning state
+			service.Health = health.WARNING //(re)set warning state
 		}
 
-		if oldHealth == 1 && service.ThresholdCounter >= service.Threshold {
-			service.Health = 2       //It's officially down!
-			NewAction(service).Run() //Ready for action
+		if oldHealth == health.WARNING && service.ThresholdCounter >= service.Threshold {
+			service.Health = health.CRITICAL //Service is down
+			NewAction(service).Run()         //Ready for action
 		}
 	} else {
 		oldHealth := service.Health
-		service.Health = 0
+		service.Health = health.OK
 		service.ThresholdCounter = 0
-		if oldHealth == 2 {
+		if oldHealth == health.CRITICAL {
 			a := NewAction(service) //Ready for recovery notify
 			a.Run()
 		}
