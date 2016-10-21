@@ -30,7 +30,7 @@ func BuildNotificationMessage(identifier string, currentHealth int, host string,
 
 	switch currentHealth {
 	case health.CRITICAL:
-		actionTypeString = "🔴"
+		actionTypeString = "❌"
 	case health.OK:
 		actionTypeString = "✅"
 	case health.WARNING:

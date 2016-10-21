@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os/exec"
 	"strconv"
+	"strings"
+	"syscall"
 	"time"
 
 	log "github.com/mdeheij/logwrap"
@@ -26,7 +28,7 @@ func CheckService(timeout int, command string) (status int, output string, rtime
 	elapsedTimeHuman := elapsedTime.Nanoseconds() / 1000000
 
 	symbol := message.StatusColor("●", status)
-	log.Debug(symbol + " (" + strconv.Itoa(status) + ") - " + command + " -" + output)
+	log.Debug(symbol + " (" + strconv.Itoa(status) + ") - " + command + " - " + output)
 
 	return status, output, elapsedTimeHuman
 }
@@ -38,67 +40,56 @@ func Execute(timeout int, cmdName string, cmdArgs ...string) (status int, output
 
 	cmdOutput := &bytes.Buffer{}
 	errOutput := &bytes.Buffer{}
-	// fail := false
+
+	fail := false
 	killed := false
+
 	cmd.Stdout = cmdOutput
 	cmd.Stderr = errOutput
-	log.Notice(cmdName, "Voor de run")
-	// var waitStatus syscall.WaitStatus
 
+	var waitStatus syscall.WaitStatus
+
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Start()
 
-	timer := time.AfterFunc(3*time.Second, func() {
-		log.Warning("MURDER MURDER MURDER, KILL KILL KILL", cmdName)
+	timer := time.AfterFunc(time.Duration(timeout+1)*time.Second, func() {
 		if cmd.Process != nil {
-			err := cmd.Process.Kill()
-			if err != nil {
-				log.Error(cmdName, "CANNOT BE KILLED")
+			pgid, err := syscall.Getpgid(cmd.Process.Pid)
+			if err == nil {
+				syscall.Kill(-pgid, 15) // note the minus sign
+				log.Notice("Killed PID", pgid, "because of timeout of ", timeout, "seconds while running", cmdName)
+				killed = true
 			}
-			log.Notice("pid", cmd.Process.Pid)
-			killed = true
-			return
 		} else {
-			log.Warning("Tried to kill", cmdName, "but it didn't exists (anymore).")
+			log.Error("Tried to kill but it didn't exist (anymore).", cmdName, cmdArgs)
 		}
 	})
 
-	log.Notice(cmdName, "Na de timer")
-
-	//
-	// if err := cmd.Run(); err != nil {
-	// 	log.Notice(cmdName, "Positie 1")
-	// 	if err != nil {
-	// 		log.Notice(cmdName, "Positie 1:faal")
-	// 		fail = true
-	// 	}
-	// 	log.Notice(cmdName, "Positie 2")
-	//
-	// 	if exitError, ok := err.(*exec.ExitError); ok {
-	// 		log.Notice(cmdName, "Positie 2b")
-	// 		waitStatus = exitError.Sys().(syscall.WaitStatus)
-	// 	}
-	// } else {
-	// 	log.Notice(cmdName, "Positie 2c::success")
-	// 	// Success
-	// 	waitStatus = cmd.ProcessState.Sys().(syscall.WaitStatus)
-	// 	log.Notice(cmdName, "Positie 3")
-	// }
-	log.Notice(cmdName, "Na de run")
+	if err := cmd.Wait(); err != nil {
+		if err != nil {
+			fail = true
+		}
+		if exitError, ok := err.(*exec.ExitError); ok {
+			waitStatus = exitError.Sys().(syscall.WaitStatus)
+		}
+	} else {
+		// Success
+		waitStatus = cmd.ProcessState.Sys().(syscall.WaitStatus)
+	}
 
 	timer.Stop()
 
 	if killed {
-		return 5, "Timeout for check"
+		return 124, "CRITICAL - Script timeout while running check."
 	}
 
-	return 404, "End of check"
-	// outputString := string(cmdOutput.Bytes())
-	// shortOutputStrings := strings.Split(outputString, "\n")
-	// statusCode := waitStatus.ExitStatus()
-	//
-	// if waitStatus.ExitStatus() == 0 && fail {
-	// 	statusCode = 420
-	// }
-	//
-	// return statusCode, shortOutputStrings[0]
+	outputString := string(cmdOutput.Bytes())
+	shortOutputStrings := strings.Split(outputString, "\n")
+	statusCode := waitStatus.ExitStatus()
+
+	if waitStatus.ExitStatus() == 0 && fail {
+		statusCode = 420
+	}
+
+	return statusCode, shortOutputStrings[0]
 }
