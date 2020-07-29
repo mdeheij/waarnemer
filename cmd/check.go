@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"waarnemer/di"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,11 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Run a known check manually",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("check called")
+		cr := di.InitializeCheckRepository()
+
+		for x, check := range cr.FindAllChecks() {
+			fmt.Printf("#%d %s [%s]\n", x, check.Identifier, check.Type)
+		}
 	},
 }
 
