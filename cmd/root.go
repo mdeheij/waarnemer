@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
-
+	log "github.com/sirupsen/logrus"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
@@ -49,6 +49,12 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	if verbose {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
