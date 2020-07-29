@@ -26,6 +26,7 @@ import (
 )
 
 var cfgFile string
+var verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "waarnemer",
@@ -42,6 +43,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.waarnemer.yaml)")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Show more verbose log messages")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
