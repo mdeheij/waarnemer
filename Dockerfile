@@ -16,7 +16,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -v -a .
 
 # Application image without Go to reduce image size
-FROM alpine AS kernreactor
+FROM alpine AS app
 RUN apk add ca-certificates
 WORKDIR /app
 
